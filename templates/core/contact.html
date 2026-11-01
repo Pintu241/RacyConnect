@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Sustainability Team | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-white border-bottom">
+    <div class="container text-center">
+        <span class="badge-live mb-2 d-inline-block">COMMUNICATION DESK</span>
+        <h1 class="fw-bold display-5 text-dark mb-2">We're Here to Help You Recycle</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 650px;">
+            Have questions about benchmark rates, bulk commercial collections, collector partnerships, or corporate e-waste disposal?
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <div class="card-bento p-4 p-lg-5 bg-white shadow-lg">
+                <h4 class="fw-bold mb-4 text-dark">Send Us a Direct Message</h4>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Your Full Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject *</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}<div class="text-danger small mt-1">{{ form.subject.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Message *</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}<div class="text-danger small mt-1">{{ form.message.errors }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-recy btn-lg w-100">
+                        <i class="bi bi-send me-2"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold mb-4 text-dark">Platform Headquarters & Regional Hubs</h3>
+                    
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="metric-icon-box bg-success-subtle text-success flex-shrink-0">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Central Technology Hub</h6>
+                            <p class="text-muted small mb-0">Eco Innovation Tower, Floor 8, Green Tech Park, Sector 4, Metro Area</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="metric-icon-box bg-primary-subtle text-primary flex-shrink-0">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Helpline & WhatsApp Support</h6>
+                            <p class="text-muted small mb-0">+91 1800-RECY-CONNECT (Toll Free: 9 AM - 7 PM Daily)</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="metric-icon-box bg-warning-subtle text-warning flex-shrink-0">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Email Dispatch</h6>
+                            <p class="text-muted small mb-0">support@recyconnect.org &bull; partnerships@recyconnect.org</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-3 bg-light border">
+                    <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-shield-check text-success me-1"></i> Facing a Pickup Grievance?</h6>
+                    <p class="small text-muted mb-3">
+                        If a collector quoted an unfair rate or did not arrive on time, log an official ticket for immediate admin mediation.
+                    </p>
+                    <a href="{% url 'core:complaint' %}" class="btn btn-recy-outline btn-sm">
+                        Submit a Formal Ticket &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

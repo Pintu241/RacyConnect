@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}How It Works | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-white border-bottom">
+    <div class="container text-center">
+        <span class="badge-live mb-2 d-inline-block">STEP-BY-STEP WORKFLOW</span>
+        <h1 class="fw-bold display-5 text-dark mb-2">How RecyConnect Powers the Circular Loop</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 680px;">
+            A transparent, dignified, and technology-driven process unifying households, informal collectors, and industrial recycling plants.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- For Households & Businesses -->
+    <div class="mb-5 pb-5 border-bottom">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="metric-icon-box bg-success-subtle text-success">
+                <i class="bi bi-house"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">For Households & Businesses (Scrap Sellers)</h3>
+                <p class="text-muted mb-0">Earn fair cash from recyclables with zero doorstep friction.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-success mb-2 d-block">Step 01</span>
+                    <h5 class="fw-bold text-dark">Segregate & Estimate</h5>
+                    <p class="text-muted small">Gather paper, plastics, scrap metals, or electronics. Check live indicative rates on RecyConnect.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-success mb-2 d-block">Step 02</span>
+                    <h5 class="fw-bold text-dark">Book Doorstep Pickup</h5>
+                    <p class="text-muted small">Enter your address, estimate weight, choose a convenient date/time slot, and attach an optional photo.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-success mb-2 d-block">Step 03</span>
+                    <h5 class="fw-bold text-dark">Digital Weighing</h5>
+                    <p class="text-muted small">A verified local collector visits on time. Materials are weighed in front of you using certified electronic scales.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-success mb-2 d-block">Step 04</span>
+                    <h5 class="fw-bold text-dark">Instant Payment</h5>
+                    <p class="text-muted small">Receive instant cash or direct UPI transfer. Download your digital recycling receipt with carbon footprint savings.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="{% url 'pickups:create' %}" class="btn btn-recy btn-lg">Schedule Your Scrap Pickup Now &rarr;</a>
+        </div>
+    </div>
+
+    <!-- For Scrap Collectors -->
+    <div class="mb-5 pb-5 border-bottom">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="metric-icon-box bg-primary-subtle text-primary">
+                <i class="bi bi-bicycle"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">For Scrap Collectors (Field Partners)</h3>
+                <p class="text-muted mb-0">Maximize daily revenue with automated dispatch and certified scales.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-primary mb-2 d-block">01. Browse Open Leads</span>
+                    <h5 class="fw-bold text-dark">Accept Nearby Jobs</h5>
+                    <p class="text-muted small">Inspect open scrap pickup requests in your mapped service area and accept them with 1 click.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-primary mb-2 d-block">02. Doorstep Weighing</span>
+                    <h5 class="fw-bold text-dark">Weigh & Lock Rates</h5>
+                    <p class="text-muted small">Visit the customer address, weigh with calibrated scale, and confirm the auto-calculated settlement.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-primary mb-2 d-block">03. Bulk Industrial Supply</span>
+                    <h5 class="fw-bold text-dark">Sell to Formal Plants</h5>
+                    <p class="text-muted small">Aggregate collected volumes and supply bulk lots to certified recycling partners at wholesale margins.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="{% url 'accounts:register' %}?role=collector" class="btn btn-recy btn-lg">Join as a Verified Collector &rarr;</a>
+        </div>
+    </div>
+
+    <!-- For Industrial Recyclers -->
+    <div>
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="metric-icon-box bg-warning-subtle text-warning">
+                <i class="bi bi-building-gear"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">For Industrial Recycling Plants</h3>
+                <p class="text-muted mb-0">Direct procurement of sorted feedstock with full traceability.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-dark mb-2 d-block">01. Monitor Stocks</span>
+                    <h5 class="fw-bold text-dark">Aggregated Inventory</h5>
+                    <p class="text-muted small">Track real-time collected tonnage of PET, cardboard, metal alloys, and e-waste across platform hubs.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-dark mb-2 d-block">02. Place Bulk POs</span>
+                    <h5 class="fw-bold text-dark">Custom Contracts</h5>
+                    <p class="text-muted small">Submit procurement orders specifying delivery facility addresses, minimum moisture, and offered rates.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-bento h-100">
+                    <span class="fs-5 fw-bold text-dark mb-2 d-block">03. Traceable Delivery</span>
+                    <h5 class="fw-bold text-dark">EPR Certified Chain</h5>
+                    <p class="text-muted small">Receive reliable, segregated raw material loads with transparent traceability documentation.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="{% url 'accounts:register' %}?role=recycler" class="btn btn-recy-outline btn-lg">Partner as an Industrial Recycler &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}Pickup {{ pickup.reference_id }} | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'pickups:list' %}">Pickups</a></li>
+                        <li class="breadcrumb-item active">{{ pickup.reference_id }}</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-bold mb-0 text-dark">{{ pickup.reference_id }}</h2>
+                    <span class="badge-status badge-status-{{ pickup.status }} fs-6">
+                        {{ pickup.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+                {% if user.is_collector and pickup.status == 'PENDING' %}
+                    <form method="post" action="{% url 'pickups:accept' pickup.reference_id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-recy">
+                            <i class="bi bi-check2-circle"></i> Accept This Pickup
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if user.is_collector and user == pickup.assigned_collector and pickup.status == 'ACCEPTED' %}
+                    <form method="post" action="{% url 'pickups:update_status' pickup.reference_id 'in_progress' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-recy-emerald">
+                            <i class="bi bi-truck"></i> Mark "Out for Pickup"
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if complete_form %}
+                    <button type="button" class="btn btn-recy-lime" data-bs-toggle="modal" data-bs-target="#completeModal">
+                        <i class="bi bi-check-all"></i> Record Weight & Complete
+                    </button>
+                {% endif %}
+
+                {% if cancel_form %}
+                    <button type="button" class="btn btn-recy-outline btn-sm text-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                {% endif %}
+
+                {% if pickup.status == 'COMPLETED' and pickup.transaction %}
+                    <a href="{% url 'transactions:detail' pickup.transaction.transaction_id %}" class="btn btn-recy-outline">
+                        <i class="bi bi-receipt"></i> Official Receipt
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Visual Progress Stepper -->
+    <div class="card-bento p-4 bg-white mb-4">
+        <h6 class="fw-bold text-uppercase text-muted small mb-4">Pickup Status Timeline</h6>
+        <div class="timeline-stepper">
+            <!-- Step 1: Requested -->
+            <div class="timeline-step {% if pickup.status != 'CANCELLED' %}completed{% endif %}">
+                <div class="step-bubble"><i class="bi bi-calendar-check"></i></div>
+                <span class="step-title">Requested</span>
+                <small class="text-muted" style="font-size: 0.75rem;">{{ pickup.created_at|date:"M d, H:i" }}</small>
+            </div>
+
+            <!-- Step 2: Collector Assigned -->
+            <div class="timeline-step {% if pickup.status in 'ACCEPTED,IN_PROGRESS,COMPLETED' %}completed{% elif pickup.status == 'PENDING' %}active{% endif %}">
+                <div class="step-bubble"><i class="bi bi-person-check"></i></div>
+                <span class="step-title">Collector Assigned</span>
+                <small class="text-muted" style="font-size: 0.75rem;">
+                    {% if pickup.assigned_collector %}Assigned{% else %}Pending{% endif %}
+                </small>
+            </div>
+
+            <!-- Step 3: Out for Pickup -->
+            <div class="timeline-step {% if pickup.status == 'COMPLETED' %}completed{% elif pickup.status == 'IN_PROGRESS' %}active{% endif %}">
+                <div class="step-bubble"><i class="bi bi-truck"></i></div>
+                <span class="step-title">Out for Pickup</span>
+                <small class="text-muted" style="font-size: 0.75rem;">
+                    {% if pickup.status == 'IN_PROGRESS' %}En Route{% elif pickup.status == 'COMPLETED' %}Arrived{% else %}Scheduled{% endif %}
+                </small>
+            </div>
+
+            <!-- Step 4: Weighed & Completed -->
+            <div class="timeline-step {% if pickup.status == 'COMPLETED' %}completed{% endif %}">
+                <div class="step-bubble"><i class="bi bi-cash-coin"></i></div>
+                <span class="step-title">Weighed & Paid</span>
+                <small class="text-muted" style="font-size: 0.75rem;">
+                    {% if pickup.status == 'COMPLETED' %}Settled{% else %}Pending{% endif %}
+                </small>
+            </div>
+        </div>
+
+        {% if pickup.status == 'CANCELLED' %}
+            <div class="alert alert-danger mt-4 mb-0 rounded-3">
+                <i class="bi bi-x-circle-fill me-2"></i>
+                <strong>This pickup request was cancelled.</strong>
+                {% if pickup.cancellation_reason %}
+                    <div class="small mt-1">Reason: {{ pickup.cancellation_reason }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <!-- Left: Scrap & Request Details -->
+        <div class="col-lg-8">
+            <div class="card-bento p-4 bg-white mb-4">
+                <h5 class="fw-bold text-success mb-3"><i class="bi bi-box-seam me-2"></i> Scrap Specification</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <span class="text-muted small d-block">Category</span>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <i class="bi {{ pickup.category.icon|default:'bi-recycle' }} text-success fs-5"></i>
+                                <span class="fs-5 fw-bold text-dark">{{ pickup.category.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <span class="text-muted small d-block">Estimated Scrap Weight</span>
+                            <span class="fs-5 fw-bold text-dark mt-1 d-block">{{ pickup.estimated_weight }} kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if pickup.status == 'COMPLETED' %}
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle">
+                                <span class="text-success small fw-bold d-block">Verified Actual Weight</span>
+                                <span class="fs-4 fw-bold text-success">{{ pickup.actual_weight }} kg</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle">
+                                <span class="text-success small fw-bold d-block">Agreed Rate / kg</span>
+                                <span class="fs-4 fw-bold text-success">₹{{ pickup.agreed_rate_per_kg }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle">
+                                <span class="text-success small fw-bold d-block">Total Settlement</span>
+                                <span class="fs-4 fw-bold text-success">₹{{ pickup.final_total_amount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if pickup.notes %}
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-1">Customer Notes:</h6>
+                        <p class="text-muted small bg-light p-3 rounded-3 border mb-0">{{ pickup.notes }}</p>
+                    </div>
+                {% endif %}
+
+                {% if pickup.scrap_image %}
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-2">Uploaded Scrap Photo:</h6>
+                        <img src="{{ pickup.scrap_image.url }}" alt="Scrap image" class="img-fluid rounded-3 border" style="max-height: 280px; object-fit: cover;">
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Address and Timing Card -->
+            <div class="card-bento p-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt text-success me-2"></i> Doorstep Pickup Location</h5>
+                <p class="mb-2 fw-semibold fs-5 text-dark">{{ pickup.pickup_address }}</p>
+                <p class="text-muted mb-3">{{ pickup.city }} &bull; PIN Code: {{ pickup.postal_code }}</p>
+                <div class="d-flex flex-wrap gap-4 pt-3 border-top small text-muted">
+                    <div>
+                        <i class="bi bi-calendar3 text-success me-1"></i> Preferred Date: <strong>{{ pickup.preferred_date|date:"l, M d, Y" }}</strong>
+                    </div>
+                    <div>
+                        <i class="bi bi-clock text-success me-1"></i> Time Slot: <strong>{{ pickup.get_preferred_time_slot_display }}</strong>
+                    </div>
+                    <div>
+                        <i class="bi bi-telephone text-success me-1"></i> Phone: <strong>{{ pickup.contact_phone|default:pickup.customer.phone_number }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: People Involved Cards -->
+        <div class="col-lg-4">
+            <!-- Customer Card -->
+            <div class="card-bento p-4 bg-white mb-4">
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Customer (Seller)</h6>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon-box bg-primary-subtle text-primary">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">{{ pickup.customer.get_full_name|default:pickup.customer.username }}</h6>
+                        <span class="small text-muted">{{ pickup.customer.email }}</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-top small text-muted">
+                    <i class="bi bi-telephone me-2 text-primary"></i> {{ pickup.contact_phone|default:pickup.customer.phone_number|default:"Not provided" }}
+                </div>
+            </div>
+
+            <!-- Assigned Collector Card -->
+            <div class="card-bento p-4 bg-white mb-4">
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Assigned Scrap Collector</h6>
+                {% if pickup.assigned_collector %}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="metric-icon-box bg-success-subtle text-success">
+                            <i class="bi bi-bicycle"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">{{ pickup.assigned_collector.get_full_name|default:pickup.assigned_collector.username }}</h6>
+                            {% if pickup.assigned_collector.collector_profile.is_verified %}
+                                <span class="badge bg-success-subtle text-success"><i class="bi bi-patch-check"></i> Verified Collector</span>
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning">Pending Verification</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-truck me-2 text-success"></i> Vehicle: <strong>{{ pickup.assigned_collector.collector_profile.get_vehicle_type_display|default:"Standard Loader" }}</strong>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-star-fill text-warning me-2"></i> Rating: <strong>{{ pickup.assigned_collector.collector_profile.rating|default:"5.0" }}/5.0</strong>
+                    </div>
+                    <div class="small text-muted">
+                        <i class="bi bi-telephone me-2 text-success"></i> Phone: <strong>{{ pickup.assigned_collector.phone_number|default:"+91 91234 56789" }}</strong>
+                    </div>
+
+                    {% if user.is_collector and user == pickup.assigned_collector and pickup.status in 'ACCEPTED,IN_PROGRESS' %}
+                        <hr>
+                        <form method="post" action="{% url 'pickups:update_status' pickup.reference_id 'release' %}" onsubmit="return confirm('Release this pickup request back to the open pool?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-recy-outline btn-sm w-100">
+                                <i class="bi bi-box-arrow-left me-1"></i> Release Pickup Assignment
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <div class="p-3 bg-light rounded-3 text-center">
+                        <i class="bi bi-hourglass-split text-warning fs-3 mb-2 d-block"></i>
+                        <p class="small text-muted mb-2">No collector assigned yet. Local collectors are being notified.</p>
+                        {% if user.is_collector %}
+                            <form method="post" action="{% url 'pickups:accept' pickup.reference_id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-recy btn-sm w-100 fw-bold">
+                                    <i class="bi bi-check2-circle me-1"></i> Accept Pickup Now
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Collector Completes Pickup & Records Weight -->
+{% if complete_form %}
+<div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-dark text-white p-4">
+                <h5 class="modal-title fw-bold" id="completeModalLabel">
+                    <i class="bi bi-check2-all text-success me-1"></i> Complete Pickup & Record Weight
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'pickups:complete' pickup.reference_id %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">
+                        Weigh the scrap on your certified digital scale and confirm the agreed rate per kilogram.
+                    </p>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Actual Weight (kg) *</label>
+                            {{ complete_form.actual_weight }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Agreed Rate (₹/kg) *</label>
+                            {{ complete_form.agreed_rate_per_kg }}
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Live Calculation Box -->
+                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle text-center mb-3">
+                        <span class="small text-success text-uppercase fw-bold d-block">Total Settlement Amount</span>
+                        <span class="display-6 fw-bold text-success" id="liveTotalDisplay">₹0.00</span>
+                        <div class="small text-muted mt-1">Formula: Actual Weight &times; Agreed Rate / kg</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method Handed Over</label>
+                        {{ complete_form.payment_method }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Payment Status</label>
+                        {{ complete_form.payment_status }}
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label">Transaction Notes / Reference</label>
+                        {{ complete_form.transaction_notes }}
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-recy-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-recy fw-bold px-4">
+                        <i class="bi bi-receipt me-1"></i> Save & Generate Receipt
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal: Customer Cancels Pickup -->
+{% if cancel_form %}
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white p-4">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">Cancel Pickup Request</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'pickups:cancel' pickup.reference_id %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <p class="text-muted small">Are you sure you want to cancel this pickup request? Please share a reason to help us improve service.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Reason for Cancellation</label>
+                        {{ cancel_form.cancellation_reason }}
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-recy-ghost" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger fw-bold">Confirm Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

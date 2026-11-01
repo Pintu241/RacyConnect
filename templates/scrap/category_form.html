@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | RecyConnect Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card-bento p-4 p-md-5 bg-white shadow-lg">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0 text-dark">{{ title }}</h3>
+                    <a href="{% url 'scrap:manage' %}" class="btn btn-recy-outline btn-sm">
+                        &larr; Back to List
+                    </a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Category Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Icon Class</label>
+                            {{ form.icon }}
+                            <div class="form-text small">e.g. bi-newspaper, bi-cpu</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Detailed Description</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Benchmark Base Rate (₹) *</label>
+                            {{ form.base_rate_per_kg }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Min Rate (₹) *</label>
+                            {{ form.min_rate_per_kg }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Max Rate (₹) *</label>
+                            {{ form.max_rate_per_kg }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Unit</label>
+                            {{ form.unit }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Display Sort Order</label>
+                            {{ form.order }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Recyclability Impact Note</label>
+                        {{ form.recyclability_impact }}
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        {{ form.is_active }}
+                        <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">Active & Available for Pickup</label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-recy btn-lg px-4">
+                            <i class="bi bi-save me-1"></i> Save Category
+                        </button>
+                        <a href="{% url 'scrap:manage' %}" class="btn btn-recy-ghost btn-lg">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

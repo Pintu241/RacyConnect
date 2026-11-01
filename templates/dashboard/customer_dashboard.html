@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customer Dashboard | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- SaaS Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-section-title">Main Menu</div>
+        <a href="{% url 'dashboard:customer' %}" class="sidebar-nav-item active">
+            <i class="bi bi-grid nav-icon"></i>
+            <span>Overview</span>
+        </a>
+        <a href="{% url 'pickups:create' %}" class="sidebar-nav-item">
+            <i class="bi bi-calendar-plus nav-icon"></i>
+            <span>Schedule Pickup</span>
+        </a>
+        <a href="{% url 'pickups:list' %}" class="sidebar-nav-item">
+            <i class="bi bi-list-task nav-icon"></i>
+            <span>My Bookings</span>
+        </a>
+        <a href="{% url 'transactions:list' %}" class="sidebar-nav-item">
+            <i class="bi bi-receipt nav-icon"></i>
+            <span>Receipts & Ledger</span>
+        </a>
+
+        <div class="sidebar-section-title mt-3">Platform</div>
+        <a href="{% url 'scrap:list' %}" class="sidebar-nav-item">
+            <i class="bi bi-tag nav-icon"></i>
+            <span>Live Scrap Rates</span>
+        </a>
+        <a href="{% url 'accounts:profile' %}" class="sidebar-nav-item">
+            <i class="bi bi-person-gear nav-icon"></i>
+            <span>Profile & Address</span>
+        </a>
+        <a href="{% url 'core:complaint' %}" class="sidebar-nav-item">
+            <i class="bi bi-headset nav-icon"></i>
+            <span>Support Desk</span>
+        </a>
+
+        <div class="mt-auto pt-4 border-top">
+            <div class="p-3 rounded-3 bg-light border text-center">
+                <small class="text-muted d-block mb-2">Need bulk commercial pickup?</small>
+                <a href="{% url 'pickups:create' %}" class="btn btn-recy-outline btn-sm w-100">
+                    Book Bulk Scrap
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="dashboard-content">
+        <!-- Personalized Welcome Banner -->
+        <div class="dash-banner d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <span class="badge-live mb-2 d-inline-block">HOUSEHOLD / BUSINESS PORTAL</span>
+                <h2 class="fw-bold mb-1">Welcome back, {{ user.first_name|default:user.username }}!</h2>
+                <p>Track your doorstep scrap bookings, verified weighings, and green diversion impact in real time.</p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a href="{% url 'pickups:create' %}" class="btn btn-recy-lime btn-lg">
+                    <i class="bi bi-calendar-plus"></i> Schedule Pickup
+                </a>
+            </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Total Scrap Sold</span>
+                        <div class="metric-icon-box bg-success-subtle text-success">
+                            <i class="bi bi-recycle"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value text-success">{{ total_weight|floatformat:1 }} <span class="fs-6 text-muted">kg</span></div>
+                    <div class="metric-trend text-success">
+                        <i class="bi bi-tree"></i> Diverted from landfill
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Total Earnings</span>
+                        <div class="metric-icon-box bg-warning-subtle text-warning">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value">₹{{ total_earned|floatformat:2 }}</div>
+                    <div class="metric-trend text-muted">
+                        <i class="bi bi-check-circle text-success"></i> Direct UPI / Cash payout
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Pickups Booked</span>
+                        <div class="metric-icon-box bg-primary-subtle text-primary">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value text-primary">{{ total_pickups }}</div>
+                    <div class="metric-trend text-muted">
+                        {{ completed_pickups }} completed successfully
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Active Trips</span>
+                        <div class="metric-icon-box bg-info-subtle text-info">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" style="color: #0284C7;">{{ active_pickups.count }}</div>
+                    <div class="metric-trend text-muted">
+                        In progress / matching collector
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Pickups Section -->
+        <div class="table-modern-wrapper mb-4">
+            <div class="table-modern-header">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-warning me-2"></i> Active Pickup Schedules</h5>
+                    <small class="text-muted">Doorstep scrap collections currently pending or in transit</small>
+                </div>
+                <a href="{% url 'pickups:list' %}" class="btn btn-recy-outline btn-sm">
+                    View All &rarr;
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Ref Code</th>
+                            <th>Material</th>
+                            <th>Est. Weight</th>
+                            <th>Scheduled Slot</th>
+                            <th>Collector Status</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pickup in active_pickups %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'pickups:detail' pickup.reference_id %}" class="fw-bold text-success">
+                                        {{ pickup.reference_id }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi {{ pickup.category.icon|default:'bi-box' }} text-success"></i>
+                                        <strong>{{ pickup.category.name }}</strong>
+                                    </div>
+                                </td>
+                                <td>{{ pickup.estimated_weight }} kg</td>
+                                <td>
+                                    <div>{{ pickup.preferred_date|date:"M d, Y" }}</div>
+                                    <small class="text-muted">{{ pickup.get_preferred_time_slot_display }}</small>
+                                </td>
+                                <td>
+                                    {% if pickup.assigned_collector %}
+                                        <div class="fw-semibold text-dark">
+                                            <i class="bi bi-person-check text-success me-1"></i>
+                                            {{ pickup.assigned_collector.get_full_name|default:pickup.assigned_collector.username }}
+                                        </div>
+                                        <small class="text-muted"><i class="bi bi-telephone me-1"></i> {{ pickup.assigned_collector.phone_number|default:"Available" }}</small>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-dark border">Matching nearby collector...</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-status-{{ pickup.status }}">
+                                        {{ pickup.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'pickups:detail' pickup.reference_id %}" class="btn btn-recy-outline btn-sm">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar2-check fs-2 d-block mb-2 text-success"></i>
+                                    No active pickups pending right now.
+                                    <div class="mt-2">
+                                        <a href="{% url 'pickups:create' %}" class="btn btn-recy btn-sm">Schedule a Scrap Pickup</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Completed Collections & Receipts -->
+        <div class="table-modern-wrapper">
+            <div class="table-modern-header">
+                <div>
+                    <h5 class="fw-bold mb-0 text-success"><i class="bi bi-receipt me-2"></i> Recent Completed Collections</h5>
+                    <small class="text-muted">Digital certificates and payment receipts</small>
+                </div>
+                <a href="{% url 'transactions:list' %}" class="btn btn-recy-outline btn-sm">
+                    All Receipts &rarr;
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Ref Code</th>
+                            <th>Material</th>
+                            <th>Verified Weight</th>
+                            <th>Settlement Total</th>
+                            <th>Collector</th>
+                            <th>Date</th>
+                            <th class="text-end">Official Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pickup in recent_completed %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'pickups:detail' pickup.reference_id %}" class="fw-bold text-dark">
+                                        {{ pickup.reference_id }}
+                                    </a>
+                                </td>
+                                <td>{{ pickup.category.name }}</td>
+                                <td><strong>{{ pickup.actual_weight }} kg</strong></td>
+                                <td><strong class="text-success fs-6">₹{{ pickup.final_total_amount }}</strong></td>
+                                <td>{{ pickup.assigned_collector.get_full_name|default:pickup.assigned_collector.username }}</td>
+                                <td>{{ pickup.updated_at|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    {% if pickup.transaction %}
+                                        <a href="{% url 'transactions:detail' pickup.transaction.transaction_id %}" class="btn btn-recy-outline btn-sm">
+                                            <i class="bi bi-download me-1"></i> Receipt
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">Completed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No completed pickups recorded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

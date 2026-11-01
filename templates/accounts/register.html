@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="card-bento p-4 p-md-5 bg-white shadow-lg">
+                <div class="text-center mb-4">
+                    <span class="badge-live mb-2 d-inline-block">JOIN THE PLATFORM</span>
+                    <h2 class="fw-bold mb-1 text-dark">Create Your RecyConnect Account</h2>
+                    <p class="text-muted small">Choose your role and unlock digital weighing, fair rates, and circular traceability</p>
+                </div>
+
+                <form method="post" id="registerForm" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Role Selector Visual Cards -->
+                    <div class="mb-4">
+                        <label class="form-label">Select Your Account Type</label>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card p-3 text-center border role-option h-100 cursor-pointer rounded-3" id="cardCustomer" onclick="selectRole('customer')">
+                                    <div class="metric-icon-box bg-success-subtle text-success mx-auto mb-2">
+                                        <i class="bi bi-house-door fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-dark">Customer</h6>
+                                    <small class="text-muted">Sell scrap from home or business</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card p-3 text-center border role-option h-100 cursor-pointer rounded-3" id="cardCollector" onclick="selectRole('collector')">
+                                    <div class="metric-icon-box bg-primary-subtle text-primary mx-auto mb-2">
+                                        <i class="bi bi-bicycle fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-dark">Scrap Collector</h6>
+                                    <small class="text-muted">Doorstep pickup & daily income</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card p-3 text-center border role-option h-100 cursor-pointer rounded-3" id="cardRecycler" onclick="selectRole('recycler')">
+                                    <div class="metric-icon-box bg-warning-subtle text-warning mx-auto mb-2">
+                                        <i class="bi bi-building-gear fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-dark">Recycler</h6>
+                                    <small class="text-muted">Procure bulk certified feedstock</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-none">
+                            {{ form.role }}
+                        </div>
+                        {% if form.role.errors %}<div class="text-danger small mt-1">{{ form.role.errors }}</div>{% endif %}
+                    </div>
+
+                    <!-- Common Basic Account Fields -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Username *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password *</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{ form.confirm_password.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number *</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}<div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">PIN / Postal Code *</label>
+                            {{ form.postal_code }}
+                            {% if form.postal_code.errors %}<div class="text-danger small mt-1">{{ form.postal_code.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Street Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            {{ form.city }}
+                        </div>
+                    </div>
+
+                    <!-- Role-Specific: Collector Fields -->
+                    <div id="collectorFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
+                        <h6 class="fw-bold text-success mb-3"><i class="bi bi-bicycle me-1"></i> Collector Equipment & Territory</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Vehicle Type</label>
+                                {{ form.vehicle_type }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Service Neighborhood / Area</label>
+                                {{ form.service_area }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role-Specific: Recycler Fields -->
+                    <div id="recyclerFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
+                        <h6 class="fw-bold text-info mb-3"><i class="bi bi-building-gear me-1"></i> Industrial Facility Credentials</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company / Plant Name</label>
+                                {{ form.company_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Trade / Environmental License #</label>
+                                {{ form.license_number }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-recy btn-lg w-100 fw-bold mt-2">
+                        <i class="bi bi-check-circle me-1"></i> Complete Registration
+                    </button>
+                </form>
+
+                <div class="text-center small text-muted mt-3">
+                    Already registered? 
+                    <a href="{% url 'accounts:login' %}" class="text-success fw-bold text-decoration-none">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectRole(role) {
+    const roleSelect = document.getElementById('id_role');
+    if (roleSelect) {
+        roleSelect.value = role;
+    }
+
+    const cards = {
+        'customer': document.getElementById('cardCustomer'),
+        'collector': document.getElementById('cardCollector'),
+        'recycler': document.getElementById('cardRecycler')
+    };
+
+    Object.keys(cards).forEach(r => {
+        if (cards[r]) {
+            if (r === role) {
+                cards[r].classList.add('border-success', 'bg-success-subtle');
+                cards[r].style.borderWidth = '2px';
+            } else {
+                cards[r].classList.remove('border-success', 'bg-success-subtle');
+                cards[r].style.borderWidth = '1px';
+            }
+        }
+    });
+
+    const collectorFields = document.getElementById('collectorFields');
+    const recyclerFields = document.getElementById('recyclerFields');
+
+    if (role === 'collector') {
+        collectorFields.classList.remove('d-none');
+        recyclerFields.classList.add('d-none');
+    } else if (role === 'recycler') {
+        recyclerFields.classList.remove('d-none');
+        collectorFields.classList.add('d-none');
+    } else {
+        collectorFields.classList.add('d-none');
+        recyclerFields.classList.add('d-none');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const initialRole = "{{ selected_role|default:'customer' }}";
+    selectRole(initialRole);
+});
+</script>
+<style>
+.cursor-pointer { cursor: pointer; }
+</style>
+{% endblock %}

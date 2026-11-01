@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Industrial Recycler B2B Portal | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- SaaS Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-section-title">B2B Procurement</div>
+        <a href="{% url 'dashboard:recycler' %}" class="sidebar-nav-item active">
+            <i class="bi bi-grid nav-icon"></i>
+            <span>Overview</span>
+        </a>
+        <a href="{% url 'recyclers:marketplace' %}" class="sidebar-nav-item">
+            <i class="bi bi-shop nav-icon"></i>
+            <span>Aggregated Stocks</span>
+        </a>
+        <a href="{% url 'recyclers:purchase_create' %}" class="sidebar-nav-item">
+            <i class="bi bi-cart-plus nav-icon"></i>
+            <span>New Purchase Order</span>
+        </a>
+        <a href="{% url 'recyclers:purchase_list' %}" class="sidebar-nav-item">
+            <i class="bi bi-box-seam nav-icon"></i>
+            <span>My Purchase Orders</span>
+        </a>
+
+        <div class="sidebar-section-title mt-3">Compliance & Profile</div>
+        <a href="{% url 'accounts:profile' %}" class="sidebar-nav-item">
+            <i class="bi bi-building nav-icon"></i>
+            <span>Facility Profile</span>
+        </a>
+        <a href="{% url 'transactions:list' %}" class="sidebar-nav-item">
+            <i class="bi bi-receipt nav-icon"></i>
+            <span>Invoices & Manifests</span>
+        </a>
+        <a href="{% url 'core:complaint' %}" class="sidebar-nav-item">
+            <i class="bi bi-headset nav-icon"></i>
+            <span>Support Desk</span>
+        </a>
+
+        <div class="mt-auto pt-4 border-top">
+            <div class="p-3 rounded-3 bg-light border">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-patch-check-fill text-success"></i>
+                    <strong class="small text-dark">EPR Traceability</strong>
+                </div>
+                <small class="text-muted d-block mb-2">Automated chain-of-custody</small>
+                <span class="badge bg-primary-subtle text-primary w-100">Audit Ready</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="dashboard-content">
+        <!-- Recycler Banner -->
+        <div class="dash-banner d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <span class="badge-live mb-2 d-inline-block">INDUSTRIAL RECYCLER ECOSYSTEM</span>
+                <h2 class="fw-bold mb-1">B2B Procurement: {{ user.recycler_profile.company_name|default:user.username }}</h2>
+                <p>
+                    <i class="bi bi-check2-circle text-success me-1"></i> Certified Processing Facility &bull; 
+                    Monthly Capacity: <strong>{{ user.recycler_profile.processing_capacity_tons|default:"50.0" }} Tons</strong>
+                </p>
+            </div>
+            <div class="mt-3 mt-md-0 d-flex gap-2">
+                <a href="{% url 'recyclers:purchase_create' %}" class="btn btn-recy-lime btn-lg">
+                    <i class="bi bi-cart-plus"></i> Place Bulk Order
+                </a>
+            </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Feedstock Procured</span>
+                        <div class="metric-icon-box bg-success-subtle text-success">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value text-success">{{ total_procured_kg|floatformat:0 }} <span class="fs-6 text-muted">kg</span></div>
+                    <div class="metric-trend text-muted">Segregated industrial inputs</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Material Spend</span>
+                        <div class="metric-icon-box bg-primary-subtle text-primary">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value">₹{{ total_spend|floatformat:0 }}</div>
+                    <div class="metric-trend text-muted">Direct collector payments</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Fulfilled Orders</span>
+                        <div class="metric-icon-box bg-info-subtle text-info">
+                            <i class="bi bi-check2-all"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" style="color: #0284C7;">{{ fulfilled_orders }} <span class="fs-6 text-muted">/ {{ total_orders }}</span></div>
+                    <div class="metric-trend text-muted">Completed factory receipts</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Pending POs</span>
+                        <div class="metric-icon-box bg-warning-subtle text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value text-warning">{{ pending_orders }}</div>
+                    <div class="metric-trend text-muted">Under procurement / dispatch</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aggregated Inventory Overview across Categories -->
+        <div class="table-modern-wrapper mb-4">
+            <div class="table-modern-header">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-bar-chart-steps text-success me-2"></i> Aggregated Recyclable Stock Levels</h5>
+                    <small class="text-muted">Live volume ready for bulk procurement across platform warehouses</small>
+                </div>
+                <a href="{% url 'recyclers:marketplace' %}" class="btn btn-recy-outline btn-sm">
+                    Open Marketplace &rarr;
+                </a>
+            </div>
+
+            <div class="p-4 bg-white">
+                <div class="row g-4">
+                    {% for item in stock_overview %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi {{ item.category.icon|default:'bi-recycle' }} text-success fs-5"></i>
+                                        <strong class="text-dark">{{ item.category.name }}</strong>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success">₹{{ item.category.base_rate_per_kg }}/kg</span>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Collected Stock:</span>
+                                    <strong class="text-dark">{{ item.collected_kg|floatformat:0 }} kg</strong>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: {% if item.collected_kg > 0 %}75%{% else %}15%{% endif %};"></div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{% url 'recyclers:purchase_create' %}?category={{ item.category.id }}" class="btn btn-recy-outline btn-sm w-100">
+                                        Place Purchase Tender &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12 text-center py-4 text-muted">No stock data available.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Purchase Orders Table -->
+        <div class="table-modern-wrapper">
+            <div class="table-modern-header">
+                <div>
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-box-seam me-2"></i> Recent Bulk Purchase Orders</h5>
+                    <small class="text-muted">Procurement requests and fulfillment status</small>
+                </div>
+                <a href="{% url 'recyclers:purchase_list' %}" class="btn btn-recy-outline btn-sm">
+                    View All {{ total_orders }} &rarr;
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Material</th>
+                            <th>Quantity (kg)</th>
+                            <th>Offered Rate</th>
+                            <th>Estimated Value</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th class="text-end">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for po in recent_orders %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'recyclers:purchase_detail' po.request_id %}" class="fw-bold text-success">
+                                        {{ po.request_id }}
+                                    </a>
+                                </td>
+                                <td>{{ po.category.name }}</td>
+                                <td><strong>{{ po.requested_quantity_kg|floatformat:0 }} kg</strong></td>
+                                <td>₹{{ po.offered_price_per_kg }}/kg</td>
+                                <td><strong class="text-dark">₹{{ po.total_estimated_cost|floatformat:2 }}</strong></td>
+                                <td>
+                                    <span class="badge-status badge-status-{{ po.status|lower }}">
+                                        {{ po.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ po.created_at|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'recyclers:purchase_detail' po.request_id %}" class="btn btn-recy-outline btn-sm">
+                                        View PO
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    No purchase orders placed yet.
+                                    <div class="mt-2">
+                                        <a href="{% url 'recyclers:purchase_create' %}" class="btn btn-recy btn-sm">Create First Purchase Order</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

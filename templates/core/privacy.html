@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card-bento p-4 p-lg-5 bg-white shadow-sm">
+                <span class="badge-live mb-2 d-inline-block">LEGAL & DATA COMPLIANCE</span>
+                <h1 class="fw-bold mb-2 text-dark">Privacy Policy</h1>
+                <p class="text-muted small">Effective Date: January 1, 2026 &bull; RecyConnect Platform Inc.</p>
+                <hr class="my-4">
+
+                <h4 class="fw-bold text-dark">1. Introduction</h4>
+                <p class="text-muted leading-relaxed">
+                    RecyConnect ("we", "our", or "the Platform") is committed to protecting user privacy and ensuring complete transparency regarding how identity and transaction data is handled. This policy governs household customers, scrap collectors, and industrial recyclers across all platform interfaces.
+                </p>
+
+                <h4 class="fw-bold text-dark mt-4">2. Information We Collect</h4>
+                <ul class="text-muted">
+                    <li class="mb-2"><strong>Customer Data:</strong> Name, phone number, physical doorstep address, email, and scrap photos.</li>
+                    <li class="mb-2"><strong>Collector Credentials:</strong> Government ID documentation (Aadhaar / National ID), vehicle category, service radius, and customer ratings.</li>
+                    <li class="mb-2"><strong>Industrial Recycler Credentials:</strong> Corporate incorporation, environmental pollution control licenses, facility unloading addresses, and procurement tenders.</li>
+                    <li class="mb-2"><strong>Transaction Records:</strong> Calibrated weighing manifests, category rates, GPS timestamps, and electronic payment references.</li>
+                </ul>
+
+                <h4 class="fw-bold text-dark mt-4">3. Data Security & Storage</h4>
+                <p class="text-muted leading-relaxed">
+                    All authentication records are salted and hashed using PBKDF2 with SHA-256 encryption. We never sell personal or operational data to third-party ad networks.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

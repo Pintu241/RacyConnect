@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card-bento p-4 p-lg-5 bg-white shadow-sm">
+                <span class="badge-live mb-2 d-inline-block">USER AGREEMENT</span>
+                <h1 class="fw-bold mb-2 text-dark">Terms of Service</h1>
+                <p class="text-muted small">Effective Date: January 1, 2026 &bull; RecyConnect Platform Inc.</p>
+                <hr class="my-4">
+
+                <h4 class="fw-bold text-dark">1. Acceptance of Terms</h4>
+                <p class="text-muted leading-relaxed">
+                    By accessing or creating an account on the RecyConnect web application, you agree to comply with and be bound by these Terms of Service.
+                </p>
+
+                <h4 class="fw-bold text-dark mt-4">2. Ecosystem Stakeholder Obligations</h4>
+                <ul class="text-muted">
+                    <li class="mb-2"><strong>Customers:</strong> Must provide accurate doorstep address details and segregate scrap items responsibly. Dangerous goods, unwashed medical waste, or explosive hazards are strictly prohibited.</li>
+                    <li class="mb-2"><strong>Collectors:</strong> Must employ certified electronic scales. Any physical scale tampering or artificial calibration leads to immediate permanent revocation of platform verification.</li>
+                    <li class="mb-2"><strong>Industrial Recyclers:</strong> Must maintain active environmental pollution control board permits and process materials in compliant facilities.</li>
+                </ul>
+
+                <h4 class="fw-bold text-dark mt-4">3. Price Calculations and Transactions</h4>
+                <p class="text-muted leading-relaxed">
+                    The final transaction total is calculated strictly as: <code>Total Amount = Verified Actual Weight (kg) &times; Agreed Rate per Kilogram</code>. Indicative rates displayed on the platform represent benchmark indices; final confirmation occurs upon electronic weighing.
+                </p>
+
+                <h4 class="fw-bold text-dark mt-4">4. Cancellations & Disputes</h4>
+                <p class="text-muted leading-relaxed">
+                    Pickup bookings can be cancelled free of charge prior to dispatch ("Out for Pickup"). If any dispute arises regarding weighing or payouts, either party may file a support ticket for mediation.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

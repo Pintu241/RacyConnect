@@ -1,0 +1,695 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}RecyConnect – Turning Everyday Waste Into Tomorrow's Resources{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section with 3D Visual Experience -->
+<section class="hero-saas">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <!-- Left Hero Column -->
+            <div class="col-lg-6">
+                <div class="hero-pill-badge">
+                    <span class="pill-dot"></span>
+                    <span>CIRCULAR ECONOMY PLATFORM • LIVE ECOSYSTEM</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Turning Everyday Waste Into <span class="text-gradient-emerald">Tomorrow's Resources.</span>
+                </h1>
+
+                <p class="hero-lead">
+                    One connected ecosystem empowering local collectors, businesses, and recycling partners to build a smarter circular economy.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    {% if user.is_authenticated and user.is_customer %}
+                        <a href="{% url 'pickups:create' %}" class="btn btn-recy-lime btn-lg">
+                            <i class="bi bi-calendar-plus"></i> Start Recycling
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:register' %}?role=customer" class="btn btn-recy-lime btn-lg">
+                            <i class="bi bi-calendar-plus"></i> Start Recycling
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'accounts:register' %}?role=collector" class="btn btn-recy-outline btn-lg">
+                        <i class="bi bi-bicycle"></i> Join as Collector
+                    </a>
+                    <a href="{% url 'scrap:list' %}" class="btn btn-recy-ghost btn-lg">
+                        <i class="bi bi-tag"></i> Live Rates
+                    </a>
+                </div>
+
+                <!-- Real Platform Dynamic Stats Strip -->
+                <div class="pt-4 border-top" style="border-color: var(--rc-border) !important;">
+                    <div class="row g-3">
+                        <div class="col-6 col-sm-3">
+                            <div class="metric-value fs-4 text-success animate-counter" data-target="{{ total_recycled_kg }}">
+                                {{ total_recycled_kg|floatformat:0 }}
+                            </div>
+                            <div class="small text-muted fw-semibold" style="font-size: 0.76rem;">kg Recycled</div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="metric-value fs-4 text-primary animate-counter" data-target="{{ total_pickups_count }}">
+                                {{ total_pickups_count }}
+                            </div>
+                            <div class="small text-muted fw-semibold" style="font-size: 0.76rem;">Doorstep Pickups</div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="metric-value fs-4 text-dark animate-counter" data-target="{{ total_collectors_count }}">
+                                {{ total_collectors_count }}
+                            </div>
+                            <div class="small text-muted fw-semibold" style="font-size: 0.76rem;">Verified Collectors</div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="metric-value fs-4 animate-counter" style="color: #0284C7;" data-target="{{ co2_saved_kg }}">
+                                {{ co2_saved_kg|floatformat:0 }}
+                            </div>
+                            <div class="small text-muted fw-semibold" style="font-size: 0.76rem;">kg CO2 Diverted</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Hero Column: 3D Visual Experience + Live Floating Cards -->
+            <div class="col-lg-6">
+                <div class="stage-3d-wrapper">
+                    <!-- 3D Interactive Canvas Scene -->
+                    <div class="stage-canvas-container">
+                        <canvas id="recy3DCanvas"></canvas>
+                    </div>
+
+                    <!-- Floating Glass Card 1 (Top Right) -->
+                    <div class="floating-glass-card glass-card-top-right">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-success-subtle text-success p-1"><i class="bi bi-shield-check"></i></span>
+                            <strong class="small text-dark">Calibrated Digital Scale</strong>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.78rem;">
+                            Live Rate Index: <span class="fw-bold text-success" id="heroLiveRate">₹14.00 - ₹48.00/kg</span>
+                        </div>
+                    </div>
+
+                    <!-- Floating Glass Card 2 (Bottom Left) -->
+                    <div class="floating-glass-card glass-card-bottom-left">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-warning-subtle text-warning p-1"><i class="bi bi-lightning-charge-fill"></i></span>
+                            <strong class="small text-dark">Instant UPI Settlement</strong>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.78rem;">
+                            Auto-transferred to seller upon digital weigh-in
+                        </div>
+                    </div>
+
+                    <!-- Floating Glass Card 3 (Bottom Right) -->
+                    <div class="floating-glass-card glass-card-bottom-right">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-info-subtle text-info p-1"><i class="bi bi-patch-check-fill"></i></span>
+                            <strong class="small text-dark">EPR Traceability</strong>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.78rem;">
+                            End-to-end industrial chain of custody
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instant Scrap Value Estimator embedded right in hero -->
+                <div class="card-bento mt-3 p-3 p-md-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-calculator text-success fs-5"></i>
+                            <h6 class="fw-bold mb-0 text-dark">Instant Scrap Value Estimator</h6>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle" id="calcRateBadge">Live Rate</span>
+                    </div>
+
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label small mb-1">Material Category</label>
+                            <select class="form-select form-select-sm" id="calcCategory">
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}" data-rate="{{ cat.base_rate_per_kg }}" {% if forloop.first %}selected{% endif %}>
+                                        {{ cat.name }} (₹{{ cat.base_rate_per_kg }}/{{ cat.unit }})
+                                    </option>
+                                {% empty %}
+                                    <option value="1" data-rate="14.00">Paper & Cardboard (₹14/kg)</option>
+                                    <option value="2" data-rate="28.00">Plastics & PET (₹28/kg)</option>
+                                    <option value="3" data-rate="35.00">Metals & Iron (₹35/kg)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="form-label small mb-1">Estimated Weight</label>
+                                <small class="text-muted"><span id="weightDisplay">20</span> kg</small>
+                            </div>
+                            <input type="range" class="form-range" id="calcWeightRange" min="1" max="200" value="20">
+                            <input type="hidden" id="calcWeight" value="20">
+                        </div>
+                        <div class="col-md-3 text-md-end">
+                            <small class="text-muted d-block" style="font-size: 0.72rem;">ESTIMATED PAYOUT</small>
+                            <span class="fs-5 fw-bold text-success" id="calcEstimatedAmount">₹280.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Trusted Ecosystem / Stakeholder Introduction -->
+<section class="py-5" style="background: var(--rc-surface); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-people-fill text-success"></i> Three-Sided Connected Network</span>
+            <h2 class="display-6 fw-bold">Built for Every Circular Economy Stakeholder</h2>
+            <p class="text-muted">RecyConnect unifies the three critical links in the waste-to-resource value chain.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Stakeholder 1: Households & Commercial Businesses -->
+            <div class="col-lg-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="metric-icon-box bg-success-subtle text-success">
+                            <i class="bi bi-house-door-fill"></i>
+                        </div>
+                        <span class="badge bg-success-subtle text-success">Doorstep Convenience</span>
+                    </div>
+                    <h4 class="fw-bold mb-2">Households & Commercial Offices</h4>
+                    <p class="small text-muted flex-grow-1">
+                        Schedule doorstep pickups in seconds. Get paid transparent market prices on calibrated digital scales with instant UPI transfers and official diversion certificates.
+                    </p>
+                    <ul class="list-unstyled small mb-4">
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Verified local collector arrivals</li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Certified digital weighing scales</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Real-time pickup status tracking</li>
+                    </ul>
+                    <a href="{% url 'accounts:register' %}?role=customer" class="btn btn-recy-outline btn-sm w-100">
+                        Join as Household / Business &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stakeholder 2: Scrap Collectors -->
+            <div class="col-lg-4">
+                <div class="card-bento h-100 d-flex flex-column" style="border-top: 3px solid var(--rc-emerald);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="metric-icon-box bg-primary-subtle text-primary">
+                            <i class="bi bi-bicycle"></i>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary">Dignified Livelihood</span>
+                    </div>
+                    <h4 class="fw-bold mb-2">Independent Scrap Collectors</h4>
+                    <p class="small text-muted flex-grow-1">
+                        Turn idle travel time into predictable route revenue. Receive direct neighborhood pickup requests, build verified credentials, and sell aggregated volumes at bulk wholesale prices.
+                    </p>
+                    <ul class="list-unstyled small mb-4">
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Open pickup leads marketplace</li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Automated digital receipts & pricing</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Direct supply link to industrial recyclers</li>
+                    </ul>
+                    <a href="{% url 'accounts:register' %}?role=collector" class="btn btn-recy btn-sm w-100">
+                        Register as Verified Collector &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stakeholder 3: Recycling Plants -->
+            <div class="col-lg-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="metric-icon-box bg-warning-subtle text-warning">
+                            <i class="bi bi-building-gear"></i>
+                        </div>
+                        <span class="badge bg-warning-subtle text-dark">Industrial Procurement</span>
+                    </div>
+                    <h4 class="fw-bold mb-2">Industrial Recyclers & Mills</h4>
+                    <p class="small text-muted flex-grow-1">
+                        Secure steady, high-grade segregated feedstock without intermediaries. Place custom procurement orders, track warehouse volumes, and guarantee full EPR chain of custody.
+                    </p>
+                    <ul class="list-unstyled small mb-4">
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Live aggregated inventory tracking</li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Bulk purchase order procurement</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-check2 text-success"></i> Extended Producer Responsibility (EPR) logs</li>
+                    </ul>
+                    <a href="{% url 'accounts:register' %}?role=recycler" class="btn btn-recy-outline btn-sm w-100">
+                        Join as Industrial Recycler &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. How RecyConnect Works – Visual Four-Step Workflow -->
+<section class="py-5" style="background: var(--rc-bg); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-arrow-repeat text-success"></i> Seamless Lifecycle</span>
+            <h2 class="display-6 fw-bold">How RecyConnect Works</h2>
+            <p class="text-muted">A fully digitized end-to-end workflow from household doorstep to industrial recovery plant.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Step 1 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card-bento h-100">
+                    <div class="step-bubble mb-3" style="background: var(--rc-forest); color: var(--rc-lime); border-color: var(--rc-lime);">1</div>
+                    <h5 class="fw-bold mb-2">Schedule Pickup</h5>
+                    <p class="small text-muted mb-0">
+                        Select scrap categories, estimate kilograms, choose your preferred doorstep date/time window, and attach an optional photo.
+                    </p>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card-bento h-100">
+                    <div class="step-bubble mb-3" style="background: var(--rc-emerald); color: #fff; border-color: var(--rc-emerald);">2</div>
+                    <h5 class="fw-bold mb-2">Verified Arrival</h5>
+                    <p class="small text-muted mb-0">
+                        A background-checked local collector arrives at your doorstep equipped with calibrated, certified digital weighing scales.
+                    </p>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card-bento h-100">
+                    <div class="step-bubble mb-3" style="background: var(--rc-forest-deep); color: #fff; border-color: var(--rc-border-strong);">3</div>
+                    <h5 class="fw-bold mb-2">Instant Payout</h5>
+                    <p class="small text-muted mb-0">
+                        Actual weight is locked into the app. Total payout is calculated automatically and sent directly via UPI or cash with an official receipt.
+                    </p>
+                </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card-bento h-100">
+                    <div class="step-bubble mb-3" style="background: var(--rc-lime); color: var(--rc-forest-deep); border-color: var(--rc-forest-deep);">4</div>
+                    <h5 class="fw-bold mb-2">Circular Processing</h5>
+                    <p class="small text-muted mb-0">
+                        Collected materials are aggregated and transferred to certified recycling companies for industrial repurposing into new products.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Scrap Categories Live Rate Showcase -->
+<section class="py-5" style="background: var(--rc-surface); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+            <div>
+                <span class="eco-pill text-uppercase mb-2"><i class="bi bi-tag-fill text-success"></i> Transparent Market Pricing</span>
+                <h2 class="display-6 fw-bold mb-0">Live Scrap Rates & Materials</h2>
+            </div>
+            <a href="{% url 'scrap:list' %}" class="btn btn-recy-outline mt-3 mt-md-0">
+                View Full Indicative Price Index &rarr;
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for cat in categories %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card-bento h-100 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="metric-icon-box bg-success-subtle text-success">
+                                <i class="bi {{ cat.icon|default:'bi-recycle' }}"></i>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success-subtle text-success fs-6 fw-bold px-3 py-1">
+                                    ₹{{ cat.base_rate_per_kg }} / {{ cat.unit }}
+                                </span>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Benchmark Rate</small>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-2">
+                            <a href="{% url 'scrap:detail' cat.slug %}" class="text-dark hover-success">
+                                {{ cat.name }}
+                            </a>
+                        </h5>
+                        <p class="small text-muted flex-grow-1 mb-3">
+                            {{ cat.description|truncatewords:20 }}
+                        </p>
+
+                        <div class="p-2 rounded-3 bg-light small mb-3 border d-flex justify-content-between text-muted" style="font-size: 0.8rem;">
+                            <span>Typical Range:</span>
+                            <strong class="text-dark">₹{{ cat.min_rate_per_kg }} - ₹{{ cat.max_rate_per_kg }}/{{ cat.unit }}</strong>
+                        </div>
+
+                        <div class="small text-success mb-3" style="font-size: 0.8rem;">
+                            <i class="bi bi-recycle me-1"></i> {{ cat.recyclability_impact }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'scrap:detail' cat.slug %}" class="btn btn-recy-outline btn-sm flex-grow-1">
+                                Items Accepted
+                            </a>
+                            <a href="{% url 'pickups:create' %}" class="btn btn-recy btn-sm">
+                                Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 text-muted">
+                    No active scrap categories found.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 5. Feature Showcase Bento Grid (Linear & Stripe Style) -->
+<section class="py-5" style="background: var(--rc-bg); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-cpu text-primary"></i> Enterprise Architecture</span>
+            <h2 class="display-6 fw-bold">Engineered for Transparency & Scale</h2>
+            <p class="text-muted">Eliminating exploitation, inaccurate weighing, and black-market recycling through verifiable digital technology.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card-bento card-bento-dark p-4 p-md-5 h-100">
+                    <div class="d-inline-flex p-2 rounded-3 bg-white bg-opacity-10 text-white mb-3">
+                        <i class="bi bi-shield-lock fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Calibrated Digital Weighing & Instant Settlement</h3>
+                    <p class="mb-4">
+                        Say goodbye to bent spring scales and arbitrary rate cuts. RecyConnect collectors utilize certified digital scales synced with our server-validated price index. The moment weighing completes, your payout is automatically credited.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <span class="eco-pill bg-white bg-opacity-10 text-white"><i class="bi bi-check2 text-success"></i> Zero Scale Tampering</span>
+                        <span class="eco-pill bg-white bg-opacity-10 text-white"><i class="bi bi-lightning text-warning"></i> UPI & Cash</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="row g-4 h-100">
+                    <div class="col-12">
+                        <div class="card-bento h-100">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="metric-icon-box bg-success-subtle text-success">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">Geo-Matched Collector Dispatch</h5>
+                                    <small class="text-muted">Hyper-local neighborhood routing</small>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0">
+                                Smart radius algorithms match household scrap requests with collectors already on transit in their vicinity, cutting fuel burn and guaranteeing same-day pickups.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card-bento h-100">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="metric-icon-box bg-info-subtle text-info">
+                                    <i class="bi bi-file-earmark-bar-graph"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">Extended Producer Responsibility (EPR)</h5>
+                                    <small class="text-muted">Audit-ready industrial compliance</small>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0">
+                                Every kilogram collected through RecyConnect receives an immutable digital manifest, giving brands and recyclers traceable documentation for government environmental compliance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Circular Economy Visualization & Real Impact Stats -->
+<section class="py-5" style="background: var(--rc-surface); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="eco-pill text-uppercase mb-2"><i class="bi bi-globe-americas text-success"></i> Verifiable Metrics</span>
+                <h2 class="display-6 fw-bold mb-3">Our Real-World Environmental Footprint</h2>
+                <p class="text-muted mb-4">
+                    Every household scrap collection through RecyConnect is tracked in our immutable database, translating into concrete greenhouse gas diversions and landfill prevention.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="small text-muted text-uppercase fw-semibold" style="font-size: 0.74rem;">Total Recycled</div>
+                            <div class="fs-4 fw-bold text-success animate-counter" data-target="{{ total_recycled_kg }}">
+                                {{ total_recycled_kg|floatformat:0 }}
+                            </div>
+                            <small class="text-muted">Kilograms diverted</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="small text-muted text-uppercase fw-semibold" style="font-size: 0.74rem;">CO2 Offset Equivalent</div>
+                            <div class="fs-4 fw-bold text-primary animate-counter" data-target="{{ co2_saved_kg }}">
+                                {{ co2_saved_kg|floatformat:0 }}
+                            </div>
+                            <small class="text-muted">kg GHG emissions spared</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="small text-muted text-uppercase fw-semibold" style="font-size: 0.74rem;">Pickups Executed</div>
+                            <div class="fs-4 fw-bold text-dark animate-counter" data-target="{{ total_pickups_count }}">
+                                {{ total_pickups_count }}
+                            </div>
+                            <small class="text-muted">Doorstep collections</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="small text-muted text-uppercase fw-semibold" style="font-size: 0.74rem;">Active Collectors</div>
+                            <div class="fs-4 fw-bold text-warning animate-counter" data-target="{{ total_collectors_count }}">
+                                {{ total_collectors_count }}
+                            </div>
+                            <small class="text-muted">Verified field agents</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Circular Economy Flow Graphic -->
+            <div class="col-lg-6">
+                <div class="card-bento p-4 text-center">
+                    <h6 class="fw-bold text-uppercase text-muted mb-4" style="font-size: 0.75rem; letter-spacing: 0.08em;">
+                        The Closed-Loop Circular Journey
+                    </h6>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success-subtle text-success p-2"><i class="bi bi-house"></i></span>
+                                <strong class="small text-dark">1. Households & Offices</strong>
+                            </div>
+                            <span class="small text-muted">Generate & Sort Scrap</span>
+                        </div>
+                        <div class="text-muted"><i class="bi bi-arrow-down fs-5"></i></div>
+                        <div class="p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary p-2"><i class="bi bi-bicycle"></i></span>
+                                <strong class="small text-dark">2. Verified Collectors</strong>
+                            </div>
+                            <span class="small text-muted">Digital Weigh & Pay Instant</span>
+                        </div>
+                        <div class="text-muted"><i class="bi bi-arrow-down fs-5"></i></div>
+                        <div class="p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning-subtle text-warning p-2"><i class="bi bi-building-gear"></i></span>
+                                <strong class="small text-dark">3. Industrial Recycling Mills</strong>
+                            </div>
+                            <span class="small text-muted">Smelt, Extrude & Reprocess</span>
+                        </div>
+                        <div class="text-muted"><i class="bi bi-arrow-down fs-5"></i></div>
+                        <div class="p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-info-subtle text-info p-2"><i class="bi bi-box"></i></span>
+                                <strong class="small text-dark">4. New Sustainable Goods</strong>
+                            </div>
+                            <span class="small text-muted">Zero Virgin Extraction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. Verified Community Testimonials -->
+<section class="py-5" style="background: var(--rc-bg); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-chat-quote-fill text-success"></i> Real Feedback</span>
+            <h2 class="display-6 fw-bold">Loved by Households, Collectors & Plants</h2>
+            <p class="text-muted">Discover how RecyConnect brings certainty and dignity to scrap transactions.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex text-warning mb-3">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="small text-muted flex-grow-1">
+                        "I used to argue every month with random street vendors about broken scales. With RecyConnect, Mohan Lal arrived on time with an electric loader, weighed everything on a calibrated scale, and sent ₹480 directly to my UPI."
+                    </p>
+                    <div class="d-flex align-items-center gap-3 pt-3 border-top" style="border-color: var(--rc-border) !important;">
+                        <div class="brand-icon-modern" style="width: 36px; height: 36px; font-size: 1rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark small">Rahul Sharma</strong>
+                            <small class="text-muted">Household Customer &bull; Green Valley</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex text-warning mb-3">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="small text-muted flex-grow-1">
+                        "RecyConnect completely changed my work. Instead of shouting in streets all morning, I look at the app, see 4 pickup leads within 2 kilometers, accept them, and sell full loads directly to the recycling company."
+                    </p>
+                    <div class="d-flex align-items-center gap-3 pt-3 border-top" style="border-color: var(--rc-border) !important;">
+                        <div class="brand-icon-modern" style="width: 36px; height: 36px; font-size: 1rem; background: var(--rc-emerald);">
+                            <i class="bi bi-bicycle"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark small">Mohan Lal</strong>
+                            <small class="text-muted">Verified Collector (4.9★)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex text-warning mb-3">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="small text-muted flex-grow-1">
+                        "Procuring consistent, unadulterated PET plastic bales used to be a logistics nightmare. Through RecyConnect's B2B marketplace, we place 5-ton purchase orders with transparent pricing and full EPR documentation."
+                    </p>
+                    <div class="d-flex align-items-center gap-3 pt-3 border-top" style="border-color: var(--rc-border) !important;">
+                        <div class="brand-icon-modern" style="width: 36px; height: 36px; font-size: 1rem; background: var(--rc-forest-deep);">
+                            <i class="bi bi-building-gear"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark small">EcoGreen Smelting Ltd.</strong>
+                            <small class="text-muted">Industrial Recycler Partner</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. Interactive FAQ Accordion -->
+<section class="py-5" style="background: var(--rc-surface); border-bottom: 1px solid var(--rc-border);">
+    <div class="container py-3">
+        <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-question-circle text-primary"></i> Clear Answers</span>
+            <h2 class="display-6 fw-bold">Frequently Asked Questions</h2>
+            <p class="text-muted">Everything you need to know about pricing, weighing, and door-to-door pickups.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    <!-- FAQ 1 -->
+                    <div class="accordion-item mb-3 border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading1">
+                            <button class="accordion-button fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                                How is the final price calculated at my doorstep?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body small text-muted">
+                                When a collector arrives, they inspect and place your scrap on a calibrated electronic scale. The exact weight is inputted into the RecyConnect app, multiplied by the agreed category rate (e.g. <code>Total = actual_weight * agreed_rate_per_kg</code>), and locked in front of you.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="accordion-item mb-3 border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading2">
+                            <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                                How do I receive my payment?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body small text-muted">
+                                You can choose between instant direct bank transfer via UPI QR code or cash in hand. In both cases, an official RecyConnect digital receipt is generated immediately in your dashboard.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="accordion-item mb-3 border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading3">
+                            <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                                Are RecyConnect scrap collectors verified?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body small text-muted">
+                                Yes. Every registered collector must submit government identity documents (Aadhaar / National ID) and vehicle credentials. Our platform admin team reviews and verifies every collector before they can accept customer leads.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="accordion-item mb-3 border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading4">
+                            <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4">
+                                Can commercial offices and tech parks book bulk scrap disposal?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body small text-muted">
+                                Absolutely. Businesses can register as a Commercial Customer to book large-scale collections for obsolete IT equipment, corrugated boxes, and office metal scrap with complete GST invoicing and environmental diversion certificates.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 9. Premium High-Impact CTA Section -->
+<section class="py-5" style="background: linear-gradient(135deg, var(--rc-forest-deep) 0%, var(--rc-forest) 100%); color: #FFFFFF;">
+    <div class="container text-center py-5">
+        <span class="badge-live mb-3 d-inline-block">START TODAY</span>
+        <h2 class="display-5 fw-bold mb-3 text-white">Ready to Build a Zero-Waste Future?</h2>
+        <p class="lead mx-auto mb-4" style="max-width: 620px; color: rgba(255, 255, 255, 0.8);">
+            Join thousands of households, certified collectors, and recycling plants transforming waste into clean circular resources.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'accounts:register' %}?role=customer" class="btn btn-recy-lime btn-lg">
+                <i class="bi bi-calendar-plus"></i> Schedule Scrap Pickup
+            </a>
+            <a href="{% url 'accounts:register' %}?role=collector" class="btn btn-recy-outline btn-lg" style="color: #fff !important; border-color: rgba(255,255,255,0.3);">
+                <i class="bi bi-bicycle"></i> Register as Collector
+            </a>
+            <a href="{% url 'core:contact' %}" class="btn btn-recy-ghost btn-lg" style="color: rgba(255,255,255,0.85);">
+                Talk to Sustainability Team
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

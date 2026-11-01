@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase Order {{ purchase.request_id }} | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'recyclers:purchase_list' %}">Orders</a></li>
+                        <li class="breadcrumb-item active font-monospace">{{ purchase.request_id }}</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-bold mb-0 text-dark font-monospace">{{ purchase.request_id }}</h2>
+                    <span class="badge-status badge-status-{{ purchase.status|lower }} fs-6">
+                        {{ purchase.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Admin Status Action Controls -->
+            {% if user.is_platform_admin %}
+                <div class="mt-3 mt-md-0 d-flex gap-2">
+                    {% if purchase.status == 'PENDING' %}
+                        <form method="post" action="{% url 'recyclers:status_update' purchase.request_id 'APPROVED' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-recy btn-sm">
+                                <i class="bi bi-check-circle me-1"></i> Approve Order
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if purchase.status == 'APPROVED' %}
+                        <form method="post" action="{% url 'recyclers:status_update' purchase.request_id 'FULFILLED' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-recy-lime btn-sm">
+                                <i class="bi bi-truck me-1"></i> Mark Delivered & Fulfilled
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if purchase.status != 'CANCELLED' and purchase.status != 'FULFILLED' %}
+                        <form method="post" action="{% url 'recyclers:status_update' purchase.request_id 'CANCELLED' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-recy-outline btn-sm text-danger">
+                                <i class="bi bi-x-circle me-1"></i> Cancel
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card-bento p-4 p-md-5 bg-white mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-box-seam text-success me-2"></i> Bulk Supply Specifications</h5>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <span class="small text-muted d-block">Requested Material</span>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <i class="bi {{ purchase.category.icon|default:'bi-box' }} text-success fs-5"></i>
+                                <span class="fs-5 fw-bold text-dark">{{ purchase.category.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <span class="small text-muted d-block">Bulk Quantity</span>
+                            <span class="fs-5 fw-bold text-dark mt-1 d-block">{{ purchase.requested_quantity_kg|floatformat:0 }} kilograms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <span class="small text-muted d-block">Offered Procurement Rate</span>
+                            <span class="fs-4 fw-bold text-dark mt-1 d-block">₹{{ purchase.offered_price_per_kg }} / kg</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-primary-subtle rounded-3 border border-primary-subtle">
+                            <span class="small text-primary fw-bold text-uppercase d-block">Total Estimated Value</span>
+                            <span class="fs-3 fw-bold text-primary mt-1 d-block">₹{{ purchase.total_estimated_cost|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-2 text-dark">Delivery Facility Address:</h6>
+                <p class="p-3 bg-light rounded-3 border text-dark mb-4">{{ purchase.delivery_facility_address }}</p>
+
+                {% if purchase.special_specifications %}
+                    <h6 class="fw-bold mb-2 text-dark">Quality & Moisture Thresholds:</h6>
+                    <p class="p-3 bg-light rounded-3 border text-muted small mb-0">{{ purchase.special_specifications }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card-bento p-4 bg-white mb-4">
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Procuring Recycler</h6>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="metric-icon-box bg-info-subtle text-info">
+                        <i class="bi bi-building-gear"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">{{ purchase.recycler.recycler_profile.company_name|default:purchase.recycler.username }}</h6>
+                        <span class="small text-muted">{{ purchase.recycler.email }}</span>
+                    </div>
+                </div>
+                <div class="small text-muted mb-2">
+                    License #: <strong>{{ purchase.recycler.recycler_profile.license_number|default:"Verified" }}</strong>
+                </div>
+                <div class="small text-muted mb-2">
+                    GST #: <strong>{{ purchase.recycler.recycler_profile.gst_number|default:"Registered" }}</strong>
+                </div>
+                <div class="small text-muted">
+                    <i class="bi bi-telephone me-1 text-primary"></i> {{ purchase.recycler.phone_number }}
+                </div>
+            </div>
+
+            <div class="p-4 rounded-3 bg-light border">
+                <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-shield-check text-success me-1"></i> Order Protection</h6>
+                <p class="small text-muted mb-0">
+                    All deliveries are weighed on certified weighbridges at the recycling dock with digital weight receipts archived for traceability.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

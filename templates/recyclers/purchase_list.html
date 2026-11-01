@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Purchase Orders | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge-live mb-2 d-inline-block">B2B CONTRACT LEDGER</span>
+            <h2 class="fw-bold mb-1 text-dark">Recycler Purchase Orders</h2>
+            <p class="text-muted small mb-0">Track industrial procurement contracts and facility fulfillment</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a href="{% url 'recyclers:marketplace' %}" class="btn btn-recy-outline btn-sm">
+                <i class="bi bi-shop me-1"></i> Stock Marketplace
+            </a>
+            <a href="{% url 'recyclers:purchase_create' %}" class="btn btn-recy btn-sm">
+                <i class="bi bi-cart-plus me-1"></i> New Purchase Order
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="mb-4">
+        <ul class="nav nav-pills gap-2">
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" href="?status=all">All Orders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'pending' %}active{% endif %}" href="?status=pending">Pending Review</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'approved' %}active{% endif %}" href="?status=approved">Approved</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'fulfilled' %}active{% endif %}" href="?status=fulfilled">Fulfilled & Delivered</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-modern-wrapper">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Recycler Company</th>
+                        <th>Material</th>
+                        <th>Requested Quantity</th>
+                        <th>Offered Price</th>
+                        <th>Estimated Cost</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in page_obj %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'recyclers:purchase_detail' order.request_id %}" class="fw-bold text-success font-monospace">
+                                    {{ order.request_id }}
+                                </a>
+                            </td>
+                            <td>{{ order.recycler.recycler_profile.company_name|default:order.recycler.username }}</td>
+                            <td>{{ order.category.name }}</td>
+                            <td><strong>{{ order.requested_quantity_kg|floatformat:0 }} kg</strong></td>
+                            <td>₹{{ order.offered_price_per_kg }}/kg</td>
+                            <td><strong class="text-dark">₹{{ order.total_estimated_cost|floatformat:2 }}</strong></td>
+                            <td><span class="small text-muted">{{ order.created_at|date:"M d, Y" }}</span></td>
+                            <td>
+                                <span class="badge-status badge-status-{{ order.status|lower }}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'recyclers:purchase_detail' order.request_id %}" class="btn btn-recy-outline btn-sm">
+                                    View PO &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-muted">No purchase orders found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="p-3 bg-white d-flex justify-content-between align-items-center border-top">
+                <span class="small text-muted">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link bg-success border-success">{{ page_obj.number }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

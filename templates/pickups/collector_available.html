@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Open Pickup Leads | RecyConnect Collector{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-white border-bottom">
+    <div class="container text-center">
+        <span class="badge-live mb-2 d-inline-block">OPEN MARKETPLACE</span>
+        <h1 class="fw-bold display-6 text-dark mb-2">Nearby Open Scrap Leads</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 620px;">
+            Pickups awaiting collector acceptance in your service area. Accept any request with 1-click to route to your schedule.
+        </p>
+
+        <!-- Area Search -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-5">
+                <form method="get" class="d-flex gap-2">
+                    <input type="text" name="q" class="form-control" placeholder="Search by area, landmark or neighborhood..." value="{{ query }}">
+                    <button type="submit" class="btn btn-recy"><i class="bi bi-search"></i></button>
+                    {% if query %}
+                        <a href="{% url 'pickups:available' %}" class="btn btn-recy-outline">Reset</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        {% for pickup in page_obj %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card-bento h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle px-2 py-1">
+                            <i class="bi bi-clock-history me-1"></i> Open Lead
+                        </span>
+                        <span class="fw-bold text-muted small">{{ pickup.reference_id }}</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi {{ pickup.category.icon|default:'bi-recycle' }} text-success fs-4"></i>
+                        <h5 class="fw-bold mb-0 text-dark">{{ pickup.category.name }}</h5>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Estimated Quantity:</span>
+                            <strong class="text-dark">{{ pickup.estimated_weight }} kg</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Benchmark Rate:</span>
+                            <strong class="text-success">₹{{ pickup.category.base_rate_per_kg }}/kg</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Est. Scrap Payout:</span>
+                            <strong class="text-dark">₹{{ pickup.estimated_total_amount }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted mb-3 flex-grow-1">
+                        <div><i class="bi bi-geo-alt text-primary me-1"></i> <strong>{{ pickup.pickup_address }}</strong></div>
+                        <div class="text-muted">{{ pickup.city }} &bull; PIN: {{ pickup.postal_code }}</div>
+                        <div class="mt-2"><i class="bi bi-calendar3 text-success me-1"></i> Preferred Date: <strong>{{ pickup.preferred_date|date:"M d, Y" }}</strong></div>
+                        <div><i class="bi bi-clock text-success me-1"></i> Time Window: <strong>{{ pickup.get_preferred_time_slot_display }}</strong></div>
+                    </div>
+
+                    <div class="pt-3 border-top d-flex gap-2">
+                        <a href="{% url 'pickups:detail' pickup.reference_id %}" class="btn btn-recy-outline btn-sm flex-fill">
+                            Details
+                        </a>
+                        <form method="post" action="{% url 'pickups:accept' pickup.reference_id %}" class="flex-fill">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-recy btn-sm w-100">
+                                <i class="bi bi-check2-circle me-1"></i> Accept
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-check2-all fs-1 d-block mb-2 text-success"></i>
+                No open pickups matching your search criteria right now.
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div class="mt-5 d-flex justify-content-center">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item active"><span class="page-link bg-success border-success">{{ page_obj.number }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

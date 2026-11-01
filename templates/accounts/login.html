@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-6 col-xl-5">
+            <div class="card-bento p-4 p-md-5 bg-white shadow-lg">
+                <div class="text-center mb-4">
+                    <div class="brand-icon-modern mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-dark">Welcome Back</h3>
+                    <p class="text-muted small">Sign in to your RecyConnect account</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Username or Email</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-recy btn-lg w-100 mb-3">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In to Account
+                    </button>
+                </form>
+
+                <div class="text-center small text-muted">
+                    Don't have an account yet? 
+                    <a href="{% url 'accounts:register' %}" class="fw-bold text-success">Create Free Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

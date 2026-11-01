@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Scrap Pricing Index | RecyConnect Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge-live mb-2 d-inline-block">ADMIN PRICE CONFIGURATION</span>
+            <h2 class="fw-bold mb-1 text-dark">Scrap Categories & Rate Index</h2>
+            <p class="text-muted small mb-0">Control indicative pricing index, active items, and environmental metrics</p>
+        </div>
+        <a href="{% url 'scrap:create' %}" class="btn btn-recy">
+            <i class="bi bi-plus-circle me-1"></i> Add New Category
+        </a>
+    </div>
+
+    <div class="table-modern-wrapper">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>Benchmark Base Rate (₹)</th>
+                        <th>Min - Max Range (₹)</th>
+                        <th>Unit</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                        <tr>
+                            <td class="text-muted fw-bold">#{{ cat.order }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi {{ cat.icon|default:'bi-recycle' }} fs-5 text-success"></i>
+                                    <strong>{{ cat.name }}</strong>
+                                </div>
+                            </td>
+                            <td><strong class="text-success fs-6">₹{{ cat.base_rate_per_kg }}</strong></td>
+                            <td>₹{{ cat.min_rate_per_kg }} - ₹{{ cat.max_rate_per_kg }}</td>
+                            <td>{{ cat.unit }}</td>
+                            <td>
+                                {% if cat.is_active %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'scrap:edit' cat.id %}" class="btn btn-recy-outline btn-sm">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No scrap categories found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

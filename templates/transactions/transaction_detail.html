@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice {{ txn.transaction_id }} | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Action bar on top -->
+            <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+                <a href="{% url 'transactions:list' %}" class="btn btn-recy-outline btn-sm">
+                    &larr; Back to Ledger
+                </a>
+                <div class="d-flex gap-2">
+                    <button onclick="window.print()" class="btn btn-recy-dark btn-sm">
+                        <i class="bi bi-printer me-1"></i> Print Receipt
+                    </button>
+                    <a href="{% url 'pickups:detail' txn.pickup.reference_id %}" class="btn btn-recy-lime btn-sm">
+                        <i class="bi bi-box-seam me-1"></i> View Order
+                    </a>
+                </div>
+            </div>
+
+            <!-- Receipt Paper Card (Apple / Stripe style with Official Mohar Seal) -->
+            <div class="receipt-paper p-4 p-md-5 mb-4 position-relative overflow-hidden">
+                <!-- Large Central Circular Watermark (Official Circular Mohar Background) -->
+                <div class="mohar-watermark-bg mohar-{{ txn.payment_status|lower }}" aria-hidden="true">
+                    <svg viewBox="0 0 300 300" width="340" height="340" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <path id="wmArcTop" d="M 36,150 A 114,114 0 0,1 264,150" fill="none"/>
+                            <path id="wmArcBottom" d="M 36,150 A 114,114 0 0,0 264,150" fill="none"/>
+                        </defs>
+                        <circle cx="150" cy="150" r="142" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="10,6"/>
+                        <circle cx="150" cy="150" r="130" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                        <circle cx="150" cy="150" r="88" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="5,3"/>
+                        <text font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="800" letter-spacing="4" fill="currentColor">
+                            <textPath href="#wmArcTop" startOffset="50%" text-anchor="middle">★ RECYCONNECT PLATFORM ★</textPath>
+                        </text>
+                        <text font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="700" letter-spacing="3" fill="currentColor">
+                            <textPath href="#wmArcBottom" startOffset="50%" text-anchor="middle">VERIFIED CIRCULAR SETTLEMENT</textPath>
+                        </text>
+                        <line x1="38" y1="112" x2="262" y2="112" stroke="currentColor" stroke-width="3"/>
+                        <line x1="38" y1="188" x2="262" y2="188" stroke="currentColor" stroke-width="3"/>
+                        <text x="150" y="165" text-anchor="middle" font-family="'Space Grotesk', 'Plus Jakarta Sans', sans-serif" font-size="52" font-weight="900" letter-spacing="5" fill="currentColor">
+                            {{ txn.payment_status }}
+                        </text>
+                        <text x="150" y="210" text-anchor="middle" font-family="'Inter', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5" fill="currentColor">
+                            {{ txn.created_at|date:"d M Y"|upper }}
+                        </text>
+                    </svg>
+                </div>
+
+                <!-- Official Stamped Circular Mohar Seal (Green if PAID, Red if FAILED) -->
+                <div class="mohar-seal mohar-{{ txn.payment_status|lower }}" title="{{ txn.get_payment_status_display }}">
+                    <svg viewBox="0 0 200 200" width="165" height="165" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <path id="sealArcTop" d="M 26,100 A 74,74 0 0,1 174,100" fill="none"/>
+                            <path id="sealArcBottom" d="M 26,100 A 74,74 0 0,0 174,100" fill="none"/>
+                        </defs>
+                        <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" stroke-width="3.5" stroke-dasharray="7,4"/>
+                        <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3,2"/>
+                        <text font-family="'Plus Jakarta Sans', sans-serif" font-size="10.5" font-weight="800" letter-spacing="2.6" fill="currentColor">
+                            <textPath href="#sealArcTop" startOffset="50%" text-anchor="middle">
+                                {% if txn.payment_status == 'PAID' %}★ RECYCONNECT OFFICIAL ★
+                                {% elif txn.payment_status == 'FAILED' %}✖ PAYMENT DECLINED ✖
+                                {% else %}⏳ AWAITING CLEARANCE ⏳{% endif %}
+                            </textPath>
+                        </text>
+                        <text font-family="'Plus Jakarta Sans', sans-serif" font-size="8.8" font-weight="700" letter-spacing="1.8" fill="currentColor">
+                            <textPath href="#sealArcBottom" startOffset="50%" text-anchor="middle">
+                                {% if txn.payment_status == 'PAID' %}VERIFIED DOORSTEP PAYOUT
+                                {% elif txn.payment_status == 'FAILED' %}SETTLEMENT FAILED
+                                {% else %}DOORSTEP WEIGH & PAY{% endif %}
+                            </textPath>
+                        </text>
+                        <line x1="26" y1="74" x2="174" y2="74" stroke="currentColor" stroke-width="2.5"/>
+                        <line x1="26" y1="126" x2="174" y2="126" stroke="currentColor" stroke-width="2.5"/>
+                        <text x="100" y="112" text-anchor="middle" font-family="'Space Grotesk', 'Plus Jakarta Sans', sans-serif" font-size="32" font-weight="900" letter-spacing="3" fill="currentColor">
+                            {% if txn.payment_status == 'PAID' %}PAID
+                            {% elif txn.payment_status == 'FAILED' %}FAILED
+                            {% else %}PENDING{% endif %}
+                        </text>
+                        <text x="100" y="142" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.2" fill="currentColor">
+                            {{ txn.created_at|date:"d M Y"|upper }}
+                        </text>
+                    </svg>
+                </div>
+
+                <!-- Receipt Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-4 border-bottom position-relative z-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="brand-icon-modern" style="width: 46px; height: 46px; font-size: 1.4rem;">
+                            <i class="bi bi-recycle"></i>
+                        </div>
+                        <div>
+                            <div class="brand-text-modern" style="font-size: 1.4rem;">Recy<span>Connect</span></div>
+                            <div class="small text-muted">Doorstep Digital Recycling Platform &bull; Certified Weight
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-md-end mt-3 mt-md-0 pe-md-5 me-md-4">
+                        <span class="badge {% if txn.payment_status == 'PAID' %}bg-success-subtle text-success{% elif txn.payment_status == 'FAILED' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %} fs-6 px-3 py-1 mb-1">
+                            {{ txn.get_payment_status_display }}
+                        </span>
+                        <div class="fw-bold fs-5 text-dark font-monospace">{{ txn.transaction_id }}</div>
+                        <div class="small text-muted">{{ txn.created_at|date:"F d, Y" }} &bull; {{ txn.created_at|date:"h:i A" }}</div>
+                    </div>
+                </div>
+
+                <!-- Customer and Collector Billing Details -->
+                <div class="row g-4 mb-4">
+                    <div class="col-6">
+                        <h6 class="text-uppercase text-muted fw-bold small mb-2"
+                            style="font-size: 0.72rem; letter-spacing: 0.05em;">Seller / Household Customer</h6>
+                        <h6 class="fw-bold mb-1 text-dark">{{ txn.customer.get_full_name|default:txn.customer.username
+                            }}</h6>
+                        <div class="small text-muted">{{ txn.pickup.pickup_address }}</div>
+                        <div class="small text-muted">{{ txn.pickup.city }} &bull; PIN: {{ txn.pickup.postal_code }}
+                        </div>
+                        <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{
+                            txn.pickup.contact_phone|default:txn.customer.phone_number }}</div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <h6 class="text-uppercase text-muted fw-bold small mb-2"
+                            style="font-size: 0.72rem; letter-spacing: 0.05em;">Verified Collector Agent</h6>
+                        <h6 class="fw-bold mb-1 text-dark">{{ txn.collector.get_full_name|default:txn.collector.username
+                            }}</h6>
+                        <div class="small text-muted">Vehicle: {{
+                            txn.collector.collector_profile.get_vehicle_type_display|default:"Electric Loader" }}</div>
+                        <div class="small text-muted">ID: {{
+                            txn.collector.collector_profile.id_proof_number|default:"RC-COL-VERIFIED" }}</div>
+                        <div class="small text-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Certified
+                            Digital Scale Verified</div>
+                    </div>
+                </div>
+
+                <!-- Scrap Breakdown Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Item Material</th>
+                                <th class="text-center">Verified Scale Weight</th>
+                                <th class="text-center">Rate</th>
+                                <th class="text-end">Settlement Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>{{ txn.category.name }}</strong>
+                                    <div class="small text-muted">Order Ref: {{ txn.pickup.reference_id }}</div>
+                                </td>
+                                <td class="text-center fw-bold">{{ txn.actual_weight }} kg</td>
+                                <td class="text-center">₹{{ txn.agreed_rate_per_kg }} / kg</td>
+                                <td class="text-end fw-bold text-success fs-5">₹{{ txn.total_amount }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end fw-bold">Total Payout Handed Over:</th>
+                                <th class="text-end text-success fs-4 fw-bold">₹{{ txn.total_amount }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Payment Details Banner -->
+                <div class="p-3 rounded-3 bg-light border mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-sm-6">
+                            <span class="small text-muted d-block">Settlement Method:</span>
+                            <strong class="text-dark"><i class="bi bi-wallet2 text-success me-1"></i> {{
+                                txn.get_payment_method_display }}</strong>
+                        </div>
+                        <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                            <span class="small text-muted d-block">Payment Status:</span>
+                            {% if txn.payment_status == 'PAID' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Fully Paid at Doorstep</span>
+                            {% elif txn.payment_status == 'FAILED' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Payment Failed</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Payment Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if txn.notes %}
+                    <div class="mt-2 pt-2 border-top small text-muted">
+                        <strong>Note:</strong> {{ txn.notes }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Environmental Impact Certificate Footer -->
+                <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle text-center">
+                    <div class="fw-bold text-success small mb-1">
+                        <i class="bi bi-patch-check-fill me-1"></i> Certified Circular Economy Impact
+                    </div>
+                    <div class="small text-muted">
+                        This doorstep recycling transaction prevented <strong>{{ txn.actual_weight }} kg</strong> of
+                        recyclable {{ txn.category.name|lower }} from municipal landfills, directly abating carbon
+                        emissions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

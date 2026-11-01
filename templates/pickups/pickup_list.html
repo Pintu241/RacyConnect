@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Pickup Orders | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge-live mb-2 d-inline-block">ORDER DISPATCH TRACKER</span>
+            <h2 class="fw-bold mb-1 text-dark">
+                {% if user.is_customer %}
+                    My Scrap Pickups
+                {% elif user.is_collector %}
+                    My Assigned Trips
+                {% else %}
+                    System Pickup Requests
+                {% endif %}
+            </h2>
+            <p class="text-muted small mb-0">Live status, collector assignment, and physical scale weighing records</p>
+        </div>
+
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            {% if user.is_customer %}
+                <a href="{% url 'pickups:create' %}" class="btn btn-recy">
+                    <i class="bi bi-calendar-plus"></i> Schedule Pickup
+                </a>
+            {% elif user.is_collector %}
+                <a href="{% url 'pickups:available' %}" class="btn btn-recy-lime">
+                    <i class="bi bi-search"></i> Open Leads Marketplace
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="mb-4">
+        <ul class="nav nav-pills gap-2">
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" href="?status=all">
+                    All Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'active' %}active{% endif %}" href="?status=active">
+                    Active / En Route
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'completed' %}active{% endif %}" href="?status=completed">
+                    Completed & Settled
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'cancelled' %}active{% endif %}" href="?status=cancelled">
+                    Cancelled
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Pickups Table -->
+    <div class="table-modern-wrapper">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Tracking ID</th>
+                        <th>Material</th>
+                        <th>Estimated / Actual Wt</th>
+                        <th>Scheduled Date</th>
+                        <th>Doorstep Area</th>
+                        <th>Collector</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pickup in page_obj %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'pickups:detail' pickup.reference_id %}" class="fw-bold text-success">
+                                    {{ pickup.reference_id }}
+                                </a>
+                                <div class="small text-muted">{{ pickup.created_at|date:"M d, Y" }}</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi {{ pickup.category.icon|default:'bi-box' }} text-success fs-5"></i>
+                                    <strong>{{ pickup.category.name }}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <div><strong>{{ pickup.estimated_weight }} kg</strong> <small class="text-muted">(est.)</small></div>
+                                {% if pickup.actual_weight %}
+                                    <div class="small text-success fw-bold">{{ pickup.actual_weight }} kg (actual)</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ pickup.preferred_date|date:"M d, Y" }}</div>
+                                <small class="text-muted">{{ pickup.get_preferred_time_slot_display }}</small>
+                            </td>
+                            <td>
+                                <span class="small text-muted">{{ pickup.city }} ({{ pickup.postal_code }})</span>
+                            </td>
+                            <td>
+                                {% if pickup.assigned_collector %}
+                                    <span class="small fw-semibold text-dark">
+                                        <i class="bi bi-person-check text-success me-1"></i>
+                                        {{ pickup.assigned_collector.get_full_name|default:pickup.assigned_collector.username }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Awaiting Collector</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge-status badge-status-{{ pickup.status }}">
+                                    {{ pickup.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'pickups:detail' pickup.reference_id %}" class="btn btn-recy-outline btn-sm">
+                                    View Details &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                                No pickup requests found for this filter.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <div class="p-3 bg-white d-flex justify-content-between align-items-center border-top">
+                <span class="small text-muted">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link bg-success border-success">{{ page_obj.number }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

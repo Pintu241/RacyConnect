@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us & Platform Mission | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-white border-bottom">
+    <div class="container text-center">
+        <span class="badge-live mb-2 d-inline-block">CIRCULAR INNOVATION</span>
+        <h1 class="fw-bold display-5 text-dark mb-2">Pioneering the Circular Waste Economy</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 680px;">
+            Bridging informal waste workers, responsible households, and industrial recycling giants through verifiable digital technology.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5 align-items-center mb-5">
+        <div class="col-lg-6">
+            <span class="eco-pill text-uppercase mb-2"><i class="bi bi-compass text-primary"></i> The Systemic Problem</span>
+            <h2 class="display-6 fw-bold mb-3">Why RecyConnect Was Founded</h2>
+            <p class="text-muted leading-relaxed">
+                In rapidly growing urban economies, over 80% of post-consumer waste recovery is driven by the informal sector: independent community scrap collectors. Despite their vital role in preventing landfill crises, they have historically faced price gouging, lack of formal finance, and social marginalization.
+            </p>
+            <p class="text-muted leading-relaxed">
+                Concurrently, households and commercial facilities suffer from irregular scrap pickup schedules, rigged mechanical spring scales, and zero visibility into genuine market values.
+            </p>
+            <div class="p-3 bg-light rounded-3 border-start border-4 border-success mt-4">
+                <p class="mb-0 fw-semibold text-dark">
+                    RecyConnect was engineered to organize and digitize this value chain into an audit-ready, dignified circular ecosystem where households earn top value and materials never enter landfills.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card-bento p-4 p-md-5 bg-white shadow-sm">
+                <h4 class="fw-bold text-dark mb-4"><i class="bi bi-bullseye text-success me-2"></i> Our Operating Pillars</h4>
+                <div class="d-flex align-items-start gap-3 mb-4">
+                    <div class="metric-icon-box bg-success-subtle text-success flex-shrink-0">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Transparent Benchmark Pricing</h6>
+                        <p class="text-muted small mb-0">Publishing live, tamper-proof indicative rates across all categories to protect customers and collectors alike.</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3 mb-4">
+                    <div class="metric-icon-box bg-primary-subtle text-primary flex-shrink-0">
+                        <i class="bi bi-patch-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Collector Verification & Dignity</h6>
+                        <p class="text-muted small mb-0">Equipping local collectors with verified digital credentials, smart route dispatch, and certified electronic scales.</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                    <div class="metric-icon-box bg-warning-subtle text-warning flex-shrink-0">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Closed-Loop Industrial Integration</h6>
+                        <p class="text-muted small mb-0">Direct pipelines supplying segregated, audit-ready feedstocks to certified manufacturing plants with full EPR compliance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact Stats Strip -->
+    <div class="row g-4 text-center py-4 rounded-4 card-bento bg-white">
+        <div class="col-6 col-md-3">
+            <h3 class="display-6 fw-bold text-success mb-1">99.8%</h3>
+            <p class="text-muted small mb-0">Digital Scale Accuracy</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <h3 class="display-6 fw-bold text-primary mb-1">100%</h3>
+            <p class="text-muted small mb-0">Verified Field Collectors</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <h3 class="display-6 fw-bold text-dark mb-1">Same-Day</h3>
+            <p class="text-muted small mb-0">Doorstep UPI Liquidity</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <h3 class="display-6 fw-bold text-warning mb-1">Zero</h3>
+            <p class="text-muted small mb-0">Landfill Contamination</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

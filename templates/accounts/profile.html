@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Settings | RecyConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Profile Identity Card -->
+        <div class="col-lg-4">
+            <div class="card-bento p-4 text-center bg-white shadow-sm h-100">
+                <div class="mb-3">
+                    <div class="brand-icon-modern mx-auto" style="width: 76px; height: 76px; font-size: 2.2rem; border-radius: 50%;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold mb-1 text-dark">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted small mb-2">@{{ user.username }} &bull; {{ user.email }}</p>
+                <div>
+                    <span class="badge bg-success-subtle text-success fs-6 px-3 py-1">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+
+                {% if user.is_collector and user.collector_profile %}
+                    <hr class="my-3">
+                    <div class="text-start small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Verification Status:</span>
+                            {% if user.collector_profile.is_verified %}
+                                <span class="badge bg-success"><i class="bi bi-patch-check"></i> Verified</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock-history"></i> Pending Verification</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Vehicle Type:</span>
+                            <strong>{{ user.collector_profile.get_vehicle_type_display }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Collector Rating:</span>
+                            <span class="text-warning fw-bold"><i class="bi bi-star-fill"></i> {{ user.collector_profile.rating }}/5.0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Total Scrap Collected:</span>
+                            <strong>{{ user.collector_profile.total_collected_weight }} kg</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Total Turnover:</span>
+                            <strong class="text-success">₹{{ user.collector_profile.total_earnings }}</strong>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="col-lg-8">
+            <div class="card-bento p-4 p-md-5 bg-white shadow-sm">
+                <h4 class="fw-bold mb-1 text-dark">Profile & Contact Information</h4>
+                <p class="text-muted small mb-4">Update your contact details and operational settings</p>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            {{ user_form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            {{ user_form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            {{ user_form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            {{ user_form.phone_number }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Street / Doorstep Address</label>
+                        {{ user_form.address }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            {{ user_form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            {{ user_form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Postal / PIN Code</label>
+                            {{ user_form.postal_code }}
+                        </div>
+                    </div>
+
+                    {% if collector_form %}
+                        <hr class="my-4">
+                        <h5 class="fw-bold text-success mb-3"><i class="bi bi-bicycle me-2"></i> Collector Equipment & Credentials</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Service Area</label>
+                                {{ collector_form.service_area }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Vehicle Type</label>
+                                {{ collector_form.vehicle_type }}
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">ID Proof Type</label>
+                                {{ collector_form.id_proof_type }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ID Proof Number</label>
+                                {{ collector_form.id_proof_number }}
+                            </div>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ collector_form.is_available }}
+                            <label class="form-check-label fw-semibold" for="{{ collector_form.is_available.id_for_label }}">
+                                Available for new pickup assignments
+                            </label>
+                        </div>
+                    {% endif %}
+
+                    {% if recycler_form %}
+                        <hr class="my-4">
+                        <h5 class="fw-bold text-info mb-3"><i class="bi bi-building-gear me-2"></i> Recycler Enterprise Details</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name</label>
+                                {{ recycler_form.company_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Pollution Control / Trade License</label>
+                                {{ recycler_form.license_number }}
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">GST / Tax Number</label>
+                                {{ recycler_form.gst_number }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Monthly Processing Capacity (Tons)</label>
+                                {{ recycler_form.processing_capacity_tons }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Materials Accepted</label>
+                            {{ recycler_form.materials_accepted }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-recy btn-lg px-4">
+                            <i class="bi bi-check2-circle"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
