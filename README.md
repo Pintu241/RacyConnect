@@ -1,70 +1,202 @@
-RecyConnect – Connecting Collectors, Empowering Recycling"Connecting Collectors. Empowering Recycling. Building a Greener Future."RecyConnect is an enterprise-grade, responsive Django web application designed to organize the informal scrap collection sector, simplify doorstep scrap scheduling for households and commercial businesses, introduce transparent digital weighing and price indices, and bridge community collectors directly with industrial recycling corporations.🌟 Key Platform Features1. Multi-Role Ecosystem & Custom AuthenticationCustomer (Household / Business):Instant Scrap Value Estimator with live pricing.Doorstep scrap collection booking with estimated weight, date/time slot, and photo upload.Real-time status tracking timeline (Pending → Assigned → Out for Pickup → Completed & Paid).Ability to cancel requests before pickup dispatch.Digital weighing receipts with environmental diversion impact.Scrap Collector:Verified collector profile with service areas, vehicle types (Electric Loader, Rickshaw, Mini Truck), and ID verification.Open Pickup Marketplace: Browse nearby unassigned leads and accept them with 1 click."Out for Pickup" transit status updates.Digital Weighing & Settlement: Records verified actual scrap weight and agreed price per kilogram, automatically calculating Total Amount = actual_weight * agreed_rate_per_kg.Transaction generation with cash or instant UPI settlement.Recycling Company (Industrial Recycler):Aggregated Recyclables Marketplace: Live inventory tracking of collected scrap volumes ready for bulk processing.Bulk Purchase Order placement with custom procurement rates, moisture thresholds, and facility unloading addresses.Extended Producer Responsibility (EPR) traceability documentation.Platform Administrator:Executive KPI analytics: total recycled volume (kg), turnover, active users, collector count.Chart.js visualizations: Category breakdown doughnut chart and monthly recycled volume/turnover trends.Collector Verification Queue: Inspect collector IDs and verify collectors with 1 click.System-wide pickup monitoring and dispute/complaint investigation desk.Scrap category and live indicative price CRUD management.🛠 Technology StackBackend: Python 3 & Django 6 (Server-rendered MVC)Frontend: Django Templates, HTML5, CSS3, JavaScript (ES6)UI Framework: Bootstrap 5.3 + Bootstrap IconsData Visualizations: Chart.js 4.4Database: SQLite (default development configuration; seamlessly configurable to PostgreSQL via Django settings)Authentication: Django Built-in Authentication with custom User model (accounts.User) and role decoratorsImage Processing: Pillow📂 Project Architecturerecyconnect/
+# ♻️ RecyConnect
+### Connecting Collectors. Empowering Recycling. Building a Greener Future.
+
+**RecyConnect** is an enterprise-oriented, full-stack Django web application that digitizes and streamlines the informal scrap collection and recycling ecosystem. It connects households and commercial businesses with verified scrap collectors, while enabling industrial recycling companies to procure recyclable materials through a transparent, technology-driven marketplace.
+
+The platform simplifies doorstep scrap collection, introduces transparent digital weighing and pricing, automates transaction records, and promotes a circular economy by connecting local waste collection networks directly with industrial recyclers.
+
+---
+
+## 🌍 The Problem We're Solving
+
+The informal scrap collection industry plays a crucial role in waste management, but it often operates through fragmented and unorganized processes.
+
+Some of the major challenges include:
+
+- **Lack of Transparency:** Unstandardized scrap pricing and manual weight measurements.
+- **Limited Accessibility:** Difficulty finding reliable scrap collectors for doorstep pickups.
+- **Fragmented Supply Chains:** No direct digital connection between local collectors and industrial recyclers.
+- **Poor Traceability:** Limited digital records of collected, processed, and transferred recyclable materials.
+- **Inefficient Operations:** Manual scheduling, tracking, payments, and inventory management.
+
+### 💡 Our Solution
+
+RecyConnect brings these stakeholders together through a unified digital ecosystem, making scrap collection more accessible, transparent, accountable, and efficient.
+
+---
+
+## ✨ Key Features
+
+### 1. 👤 Multi-Role Authentication & Access Control
+
+A role-based ecosystem designed for four different stakeholders:
+
+- **Customers:** Household and commercial users.
+- **Scrap Collectors:** Verified individuals managing collection requests.
+- **Industrial Recyclers:** Companies purchasing recyclable materials in bulk.
+- **Platform Administrators:** Managing users, pricing, verification, and platform analytics.
+
+Features include custom Django User authentication, role-based authorization, protected dashboards, and profile management.
+
+### 2. 🏠 Customer Portal
+
+- Instant scrap value estimation using indicative market prices.
+- Schedule doorstep scrap collection.
+- Select preferred pickup dates and time slots.
+- Specify estimated scrap weight and categories.
+- Upload scrap images for better collection assessment.
+- Track pickup progress through a real-time status timeline.
+- Cancel pickup requests before dispatch.
+- Access digital weighing receipts and environmental impact information.
+
+**Pickup Lifecycle:**
+
+`Pending → Assigned → Out for Pickup → Completed & Paid`
+
+### 3. 🚛 Scrap Collector Portal
+
+- Collector registration and profile verification.
+- Vehicle and service-area management.
+- Open pickup marketplace to discover unassigned collection requests.
+- Accept available pickup requests with one click.
+- Update collection and transit statuses.
+- Record verified scrap weight and agreed price per kilogram.
+- Automatically calculate transaction amounts.
+- Generate digital transaction records.
+- Support cash and instant UPI settlement tracking.
+
+**Transaction Calculation:**
+
+`Total Amount = Actual Weight (kg) × Agreed Rate (₹/kg)`
+
+### 4. 🏭 Industrial Recycler Marketplace
+
+A dedicated procurement portal connecting industrial recycling companies with local scrap collection networks.
+
+- Browse aggregated recyclable inventory.
+- Monitor available scrap quantities by category.
+- Place bulk purchase requests.
+- Define custom procurement rates.
+- Specify acceptable moisture thresholds.
+- Configure facility unloading addresses.
+- Maintain purchase and procurement records.
+- Support EPR traceability documentation workflows.
+
+### 5. 📊 Administrator Dashboard
+
+A centralized platform management and monitoring system.
+
+**Executive Analytics:**
+- Total recycled volume (kg).
+- Total transaction turnover.
+- Active platform users.
+- Registered and verified collectors.
+- Monthly recycling and turnover trends.
+- Scrap category distribution.
+
+**Administrative Operations:**
+- Collector identity verification queue.
+- User and role management.
+- Pickup monitoring.
+- Complaint and dispute investigation.
+- Scrap category management.
+- Indicative market price management.
+
+**Visualizations:** Interactive Chart.js doughnut and trend charts.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Backend | Python 3, Django 6 |
+| Frontend | HTML5, CSS3, JavaScript ES6 |
+| UI Framework | Bootstrap 5.3 |
+| Icons | Bootstrap Icons |
+| Database | SQLite / PostgreSQL |
+| Authentication | Django Authentication, Custom User Model |
+| Data Visualization | Chart.js 4.4 |
+| Image Processing | Pillow |
+| Architecture | Django MVT (Model-View-Template) |
+
+---
+
+## 🏗️ Project Architecture
+
+The application follows a modular Django architecture, separating business responsibilities into dedicated applications.
+
+```text
+recyconnect/
 │
 ├── manage.py
 ├── requirements.txt
 ├── .env.example
 ├── README.md
 │
-├── config/                  # Django project root settings & router
+├── config/
 │   ├── settings.py
 │   ├── urls.py
 │   ├── wsgi.py
 │   └── asgi.py
 │
-├── accounts/                # User registration, profiles, roles, decorators
-│   ├── models.py            # User, CollectorProfile, RecyclerProfile
+├── accounts/
+│   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   ├── admin.py
-│   └── decorators.py        # Role-based access control decorators
+│   └── decorators.py
 │
-├── scrap/                   # Scrap categories, indicative rates, price history
-│   ├── models.py            # ScrapCategory
+├── scrap/
+│   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   └── admin.py
 │
-├── pickups/                 # Pickup scheduling, status lifecycle, assignments
-│   ├── models.py            # PickupRequest
+├── pickups/
+│   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   └── admin.py
 │
-├── transactions/            # Verified weights, rates, totals, digital receipts
-│   ├── models.py            # Transaction
+├── transactions/
+│   ├── models.py
 │   ├── views.py
 │   ├── urls.py
 │   └── admin.py
 │
-├── recyclers/               # Recycler bulk marketplace & purchase orders
-│   ├── models.py            # PurchaseRequest
+├── recyclers/
+│   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   └── admin.py
 │
-├── dashboard/               # Role-specific dashboards & Chart.js analytics
-│   ├── views.py             # Customer, Collector, Recycler, Admin views
+├── dashboard/
+│   ├── views.py
 │   └── urls.py
 │
-├── core/                    # Homepage, About, How-it-Works, Contact, Complaints
-│   ├── models.py            # Complaint, ContactMessage
+├── core/
+│   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   ├── context_processors.py
-│   ├── tests.py             # Full workflow integration & unit tests
-│   └── management/commands/
-│       └── seed_data.py     # Realistic demonstration seed script
+│   ├── tests.py
+│   └── management/
+│       └── commands/
+│           └── seed_data.py
 │
 ├── static/
-│   ├── css/styles.css       # Custom sustainability theme & responsive layout
-│   └── js/main.js           # Live calculators & UI helpers
+│   ├── css/
+│   │   └── styles.css
+│   └── js/
+│       └── main.js
 │
-├── templates/               # Django server-rendered templates
+├── templates/
 │   ├── base.html
 │   ├── core/
 │   ├── accounts/
@@ -74,28 +206,269 @@ RecyConnect – Connecting Collectors, Empowering Recycling"Connecting Collector
 │   ├── recyclers/
 │   └── dashboard/
 │
-└── media/                   # Uploaded scrap images & profile documentation
-⚡ Quick Start & Installation1. Clone & Setup Virtual Environment# Clone the repository
+└── media/
+```
+
+### Application Responsibilities
+
+| Django App | Responsibility |
+|---|---|
+| `accounts` | Authentication, profiles, roles and permissions |
+| `scrap` | Scrap categories, indicative pricing and price management |
+| `pickups` | Scheduling, assignments and pickup lifecycle |
+| `transactions` | Digital weighing, settlement and transaction records |
+| `recyclers` | Bulk procurement and recycler marketplace |
+| `dashboard` | Role-specific dashboards and analytics |
+| `core` | Homepage, static pages, complaints and contact management |
+
+---
+
+## 🔄 How RecyConnect Works
+
+```mermaid
+flowchart TD
+    A[Customer / Business] --> B[Create Scrap Pickup Request]
+    B --> C[Collector Marketplace]
+    C --> D[Collector Accepts Request]
+    D --> E[Out for Pickup]
+    E --> F[Digital Weighing]
+    F --> G[Calculate Final Amount]
+    G --> H[Payment Settlement]
+    H --> I[Transaction Record]
+    I --> J[Aggregated Scrap Inventory]
+    J --> K[Industrial Recycler]
+    K --> L[Bulk Purchase Order]
+    L --> M[Recycling & Processing]
+```
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up RecyConnect locally.
+
+### Prerequisites
+
+Make sure you have installed:
+
+- Python 3
+- pip
+- Git
+- A code editor (VS Code recommended)
+
+### 1. Clone the Repository
+
+```bash
 git clone <repository_url>
 cd RecyConnect
+```
 
-# Create and activate virtual environment
+### 2. Create a Virtual Environment
+
+```bash
 python -m venv venv
-# On Windows:
+```
+
+**Windows:**
+
+```bash
 venv\Scripts\activate
-# On Linux/macOS:
+```
+
+**Linux / macOS:**
+
+```bash
 source venv/bin/activate
+```
 
-# Install dependencies
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-2. Apply Migrations & Seed Demo Data# Run database migrations
-python manage.py migrate
+```
 
-# Seed realistic scrap categories, users, pickups, and orders
+### 4. Configure Environment Variables
+
+Create your local `.env` file using `.env.example` as a reference.
+
+Configure your Django secret key, database credentials, and other environment-specific settings as required.
+
+Never commit your actual `.env` file or production secrets.
+
+### 5. Apply Database Migrations
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 6. Populate Demonstration Data
+
+```bash
 python manage.py seed_data
-3. Run the Development Serverpython manage.py runserver
-Navigate to http://127.0.0.1:8000/ in your browser.🔑 Demo Accounts & CredentialsThe seed script creates ready-to-test accounts for every role. You can also use the Quick Demo Switcher in the top navigation bar to switch between roles with 1 click:RoleUsernamePasswordPersona / DetailsPlatform Administratoradminadmin123Platform Admin with access to analytics & verification queueCustomer (Household)customer1pass123Rahul Sharma (Green Valley Apartments)Customer (Commercial)business1pass123Nexus Tech Hub (Office IT equipment & scrap)Scrap Collector (Verified)collector1pass123Mohan Lal (Electric Loader, 4.9★ rating)Scrap Collector (Pending)collector2pass123Ramesh Kumar (Awaiting admin verification)Industrial Recyclerrecycler1pass123EcoGreen Reclaim & Smelting Ltd.🧪 Running Automated TestsRun the comprehensive test suite verifying calculations, permissions, workflows, and endpoints:python manage.py test
-Expected result:Ran 6 tests in ~20s
+```
+
+The seed command populates the application with demonstration users, scrap categories, pickup requests, and purchase orders.
+
+### 7. Start the Development Server
+
+```bash
+python manage.py runserver
+```
+
+Open your browser:
+
+**http://127.0.0.1:8000/**
+
+---
+
+## 🔑 Demo Credentials
+
+The seed script creates demonstration accounts for all major platform roles.
+
+| Role | Username | Password |
+|---|---|---|
+| Administrator | `admin` | `admin123` |
+| Household Customer | `customer1` | `pass123` |
+| Commercial Customer | `business1` | `pass123` |
+| Verified Collector | `collector1` | `pass123` |
+| Pending Collector | `collector2` | `pass123` |
+| Industrial Recycler | `recycler1` | `pass123` |
+
+**Note:** These credentials are strictly for local demonstration purposes. Change or remove them before deploying the application to production.
+
+---
+
+## 🧪 Testing
+
+Run the automated test suite:
+
+```bash
+python manage.py test
+```
+
+The test suite is designed to validate:
+
+- Business logic and transaction calculations.
+- Role-based access permissions.
+- Pickup scheduling and status transitions.
+- Ownership and authorization restrictions.
+- Application endpoints and workflow integration.
+
+**Expected result (as configured in the current project):**
+
+```text
+Ran 6 tests
 OK
-🔒 Security & Validation DetailsCalculation Integrity: Total amounts (total_amount = actual_weight * agreed_rate_per_kg) and bulk order values are strictly calculated and validated on the server.CSRF Protection: Django CSRF tokens on all POST requests.Role-Based Access Control: Reusable decorators (@customer_required, @collector_required, @recycler_required, @admin_required) enforce permission boundaries across views.Ownership Validation: Customers can only view and cancel their own requests; collectors can only complete pickups assigned to them.Auditability: Every completed collection automatically generates an unalterable Transaction model record linking customer, collector, pickup reference, weighing data, and payment status.
-Authors - Ankush, Priyanshu, Pintu
+```
+
+---
+
+## 🔐 Security & Data Integrity
+
+RecyConnect incorporates multiple application-level security and validation mechanisms.
+
+| Security Area | Implementation |
+|---|---|
+| Authentication | Django built-in authentication with custom User model |
+| Authorization | Role-based access control decorators |
+| CSRF Protection | Django CSRF middleware and form tokens |
+| Transaction Integrity | Server-side weight and price calculations |
+| Ownership Validation | Users can access only their authorized records |
+| Collector Verification | Admin-controlled collector verification |
+| Auditability | Transaction records linked to completed pickups |
+| Input Validation | Django forms and model-level validation |
+
+### Important Business Rules
+
+1. Customers can only view and cancel their own eligible pickup requests.
+2. Collectors can only complete pickups assigned to them.
+3. Transaction amounts are calculated on the server using verified weight and agreed rates.
+4. Completed pickups generate linked transaction records.
+5. Collector access to protected marketplace operations depends on verification status.
+
+---
+
+## 🌱 Environmental Impact
+
+RecyConnect aims to make recycling measurable and accessible.
+
+The platform supports a more organized recycling ecosystem by:
+
+- Encouraging responsible household and commercial waste disposal.
+- Connecting local collectors with larger recycling facilities.
+- Improving visibility into collected recyclable materials.
+- Promoting digital records of recycled volumes.
+- Supporting traceability across the recycling supply chain.
+- Encouraging the circular economy through better material recovery.
+
+**Our vision:** Turn every recyclable item into an opportunity for a cleaner, more sustainable future.
+
+---
+
+## 🔮 Future Enhancements
+
+Potential improvements to expand the platform:
+
+- [ ] Live GPS-based collector tracking.
+- [ ] Google Maps integration for optimized pickup routes.
+- [ ] Real-time notifications using Django Channels and WebSockets.
+- [ ] Automated UPI payment gateway integration.
+- [ ] Dynamic scrap pricing based on market indices.
+- [ ] AI-powered scrap category identification using uploaded images.
+- [ ] Advanced EPR compliance and traceability reporting.
+- [ ] PostgreSQL production deployment.
+- [ ] Docker containerization and CI/CD automation.
+- [ ] Advanced environmental impact analytics.
+- [ ] Collector ratings and customer feedback.
+
+---
+
+## 👨‍💻 Authors
+
+Developed collaboratively by:
+
+- **Ankush**
+- **Priyanshu**
+- **Pintu**
+
+---
+
+## 🤝 Contributing
+
+Contributions, suggestions, and feature improvements are welcome.
+
+1. Fork the repository.
+2. Create a feature branch:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. Commit your changes:
+
+   ```bash
+   git commit -m "feat: add your feature"
+   ```
+
+4. Push your branch:
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+5. Open a Pull Request.
+
+---
+
+## 📜 License
+
+This project is currently developed for educational and demonstration purposes. Add an appropriate open-source license before permitting external redistribution.
+
+---
+
+<p align="center">
+  <b>♻️ RecyConnect — Connecting Collectors. Empowering Recycling.</b>
+  <br/>
+  Building a greener future, one collection at a time.
+</p>
