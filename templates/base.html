@@ -221,18 +221,36 @@
         </div>
     </nav>
 
-    <!-- Global Flash Notification Messages -->
-    <div class="container mt-3">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm rounded-3 py-3 d-flex align-items-center gap-2" role="alert">
-                    <i class="bi bi-info-circle-fill fs-5"></i>
-                    <div class="flex-grow-1">{{ message }}</div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Global Flash Notification Toast Container (Floating Modern SaaS Glassmorphism) -->
+    {% if messages %}
+    <div class="recy-toast-container position-fixed top-0 start-50 translate-middle-x pt-3 px-3" style="z-index: 1095; max-width: 580px; width: 100%; pointer-events: none;">
+        {% for message in messages %}
+            <div class="recy-banner recy-banner-{{ message.tags|default:'info' }} alert alert-dismissible fade show shadow-lg rounded-4 p-3 mb-2 d-flex align-items-center gap-3 border" role="alert" style="pointer-events: auto;">
+                <div class="recy-banner-icon d-flex align-items-center justify-content-center rounded-circle flex-shrink-0">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check2-circle fs-5"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                    {% elif message.tags == 'danger' or message.tags == 'error' %}
+                        <i class="bi bi-x-octagon-fill fs-5"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill fs-5"></i>
+                    {% endif %}
                 </div>
-            {% endfor %}
-        {% endif %}
+                <div class="recy-banner-content flex-grow-1">
+                    <div class="recy-banner-title fw-bold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.72rem;">
+                        {% if message.tags == 'success' %}Success
+                        {% elif message.tags == 'warning' %}Warning
+                        {% elif message.tags == 'danger' or message.tags == 'error' %}Notice
+                        {% else %}Notification{% endif %}
+                    </div>
+                    <div class="recy-banner-text text-dark fw-medium" style="font-size: 0.92rem; line-height: 1.4;">{{ message }}</div>
+                </div>
+                <button type="button" class="btn-close ms-auto my-auto p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
     </div>
+    {% endif %}
 
     <!-- Main Content Area -->
     <main>

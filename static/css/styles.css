@@ -1204,3 +1204,113 @@ a:hover {
     display: block !important;
   }
 }
+
+/* ==========================================================================
+   Modern Floating Glassmorphism Notification Banners / Toasts
+   ========================================================================== */
+.recy-toast-container {
+  animation: recyToastEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes recyToastEnter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -24px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.recy-banner {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 18px !important;
+  box-shadow: 0 16px 38px -10px rgba(15, 23, 42, 0.16),
+              0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.recy-banner:hover {
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22),
+              0 0 0 1px rgba(15, 23, 42, 0.12) !important;
+}
+
+.recy-banner .recy-banner-icon {
+  width: 44px;
+  height: 44px;
+  transition: transform 0.25s ease;
+}
+
+.recy-banner:hover .recy-banner-icon {
+  transform: scale(1.08) rotate(4deg);
+}
+
+/* Success Banner (Emerald Sustainability Theme) */
+.recy-banner-success {
+  border-left: 4px solid #10b981 !important;
+}
+.recy-banner-success .recy-banner-icon {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.3));
+  color: #059669;
+}
+.recy-banner-success .recy-banner-title {
+  color: #059669;
+}
+
+/* Info / Neutral Banner (Clean Ocean / Cyan Theme) */
+.recy-banner-info,
+.recy-banner-secondary {
+  border-left: 4px solid #0284c7 !important;
+}
+.recy-banner-info .recy-banner-icon,
+.recy-banner-secondary .recy-banner-icon {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(2, 132, 199, 0.3));
+  color: #0284c7;
+}
+.recy-banner-info .recy-banner-title,
+.recy-banner-secondary .recy-banner-title {
+  color: #0284c7;
+}
+
+/* Warning Banner (Amber Sunset Theme) */
+.recy-banner-warning {
+  border-left: 4px solid #f59e0b !important;
+}
+.recy-banner-warning .recy-banner-icon {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.3));
+  color: #d97706;
+}
+.recy-banner-warning .recy-banner-title {
+  color: #d97706;
+}
+
+/* Danger / Error Banner (Rose Red Theme) */
+.recy-banner-danger,
+.recy-banner-error {
+  border-left: 4px solid #ef4444 !important;
+}
+.recy-banner-danger .recy-banner-icon,
+.recy-banner-error .recy-banner-icon {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.3));
+  color: #dc2626;
+}
+.recy-banner-danger .recy-banner-title,
+.recy-banner-error .recy-banner-title {
+  color: #dc2626;
+}
+
+.recy-banner .btn-close {
+  opacity: 0.45;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+.recy-banner .btn-close:hover {
+  opacity: 0.95;
+  transform: scale(1.15);
+}
+
