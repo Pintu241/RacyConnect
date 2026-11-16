@@ -81,10 +81,13 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     try:
         import dj_database_url
+        if 'postgres' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
+            sep = '&' if '?' in DATABASE_URL else '?'
+            DATABASE_URL = f"{DATABASE_URL}{sep}sslmode=require"
         DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=0)
         }
-    except ImportError:
+    except Exception:
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
