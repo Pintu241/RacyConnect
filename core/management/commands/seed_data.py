@@ -37,6 +37,24 @@ class Command(BaseCommand):
             admin_user.save()
             self.stdout.write(self.style.SUCCESS('Admin user created: admin / admin123'))
 
+        kartik_user, created_k = User.objects.get_or_create(
+            username='kartik_01',
+            defaults={
+                'email': 'kartik@example.com',
+                'first_name': 'Kartik',
+                'last_name': 'Sharma',
+                'role': User.ROLE_ADMIN,
+                'is_staff': True,
+                'is_superuser': True,
+                'city': 'Green Metro',
+                'phone_number': '+91 98765 00002',
+            }
+        )
+        if created_k or not kartik_user.has_usable_password():
+            kartik_user.set_password('pass123')
+            kartik_user.save()
+            self.stdout.write(self.style.SUCCESS('Kartik admin user created: kartik_01 / pass123'))
+
         # 2. Create Scrap Categories
         categories_data = [
             {
