@@ -81,11 +81,12 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     try:
         import dj_database_url
-        if 'postgres' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
-            sep = '&' if '?' in DATABASE_URL else '?'
-            DATABASE_URL = f"{DATABASE_URL}{sep}sslmode=require"
+        clean_url = DATABASE_URL.replace('&channel_binding=require', '').replace('channel_binding=require&', '').replace('?channel_binding=require', '?')
+        if 'postgres' in clean_url and 'sslmode' not in clean_url:
+            sep = '&' if '?' in clean_url else '?'
+            clean_url = f"{clean_url}{sep}sslmode=require"
         DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=0)
+            'default': dj_database_url.parse(clean_url, conn_max_age=0)
         }
     except Exception:
         DATABASES = {
