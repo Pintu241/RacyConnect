@@ -1209,17 +1209,37 @@ a:hover {
    Modern Floating Glassmorphism Notification Banners / Toasts
    ========================================================================== */
 .recy-toast-container {
-  animation: recyToastEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: recyToastEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes recyToastEnter {
   0% {
     opacity: 0;
-    transform: translate(-50%, -24px) scale(0.96);
+    transform: translateX(36px) scale(0.96);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, 0) scale(1);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (max-width: 576px) {
+  .recy-toast-container {
+    top: 58px !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  @keyframes recyToastEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 }
 

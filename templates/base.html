@@ -221,9 +221,9 @@
         </div>
     </nav>
 
-    <!-- Global Flash Notification Toast Container (Floating Modern SaaS Glassmorphism) -->
+    <!-- Global Flash Notification Toast Container (Floating Modern SaaS Top-Right Toast) -->
     {% if messages %}
-    <div class="recy-toast-container position-fixed top-0 start-50 translate-middle-x pt-3 px-3" style="z-index: 1095; max-width: 580px; width: 100%; pointer-events: none;">
+    <div class="recy-toast-container position-fixed" style="top: 68px; right: 24px; z-index: 1095; max-width: 440px; width: calc(100% - 48px); pointer-events: none;">
         {% for message in messages %}
             <div class="recy-banner recy-banner-{{ message.tags|default:'info' }} alert alert-dismissible fade show shadow-lg rounded-4 p-3 mb-2 d-flex align-items-center gap-3 border" role="alert" style="pointer-events: auto;">
                 <div class="recy-banner-icon d-flex align-items-center justify-content-center rounded-circle flex-shrink-0">
