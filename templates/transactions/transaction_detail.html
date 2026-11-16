@@ -113,25 +113,18 @@
                     <div class="col-6">
                         <h6 class="text-uppercase text-muted fw-bold small mb-2"
                             style="font-size: 0.72rem; letter-spacing: 0.05em;">Seller / Household Customer</h6>
-                        <h6 class="fw-bold mb-1 text-dark">{{ txn.customer.get_full_name|default:txn.customer.username
-                            }}</h6>
+                        <h6 class="fw-bold mb-1 text-dark">{{ txn.customer.get_full_name|default:txn.customer.username }}</h6>
                         <div class="small text-muted">{{ txn.pickup.pickup_address }}</div>
-                        <div class="small text-muted">{{ txn.pickup.city }} &bull; PIN: {{ txn.pickup.postal_code }}
-                        </div>
-                        <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{
-                            txn.pickup.contact_phone|default:txn.customer.phone_number }}</div>
+                        <div class="small text-muted">{{ txn.pickup.city }} &bull; PIN: {{ txn.pickup.postal_code }}</div>
+                        <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ txn.pickup.contact_phone|default:txn.customer.phone_number }}</div>
                     </div>
                     <div class="col-6 text-end">
                         <h6 class="text-uppercase text-muted fw-bold small mb-2"
                             style="font-size: 0.72rem; letter-spacing: 0.05em;">Verified Collector Agent</h6>
-                        <h6 class="fw-bold mb-1 text-dark">{{ txn.collector.get_full_name|default:txn.collector.username
-                            }}</h6>
-                        <div class="small text-muted">Vehicle: {{
-                            txn.collector.collector_profile.get_vehicle_type_display|default:"Electric Loader" }}</div>
-                        <div class="small text-muted">ID: {{
-                            txn.collector.collector_profile.id_proof_number|default:"RC-COL-VERIFIED" }}</div>
-                        <div class="small text-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Certified
-                            Digital Scale Verified</div>
+                        <h6 class="fw-bold mb-1 text-dark">{{ txn.collector.get_full_name|default:txn.collector.username }}</h6>
+                        <div class="small text-muted">Vehicle: {{ txn.collector.collector_profile.get_vehicle_type_display|default:"Electric Loader" }}</div>
+                        <div class="small text-muted">ID: {{ txn.collector.collector_profile.id_proof_number|default:"RC-COL-VERIFIED" }}</div>
+                        <div class="small text-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Certified Digital Scale Verified</div>
                     </div>
                 </div>
 
@@ -171,8 +164,7 @@
                     <div class="row align-items-center">
                         <div class="col-sm-6">
                             <span class="small text-muted d-block">Settlement Method:</span>
-                            <strong class="text-dark"><i class="bi bi-wallet2 text-success me-1"></i> {{
-                                txn.get_payment_method_display }}</strong>
+                            <strong class="text-dark"><i class="bi bi-wallet2 text-success me-1"></i> {{ txn.get_payment_method_display }}</strong>
                         </div>
                         <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
                             <span class="small text-muted d-block">Payment Status:</span>
